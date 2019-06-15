@@ -109,9 +109,8 @@ void setup() {
   ArduinoOTA.begin();
 
   mqtt_client.setServer(MQTT_HOST, MQTT_PORT);
-  mqtt_client.connect(MQTT_UUID, MQTT_USER, MQTT_PASS);
   mqtt_client.setCallback(mqtt_callback);
-  mqtt_client.subscribe(MQTT_CMD_TOPIC);
+  mqtt_connect(&mqtt_client);
   Serial.println("[mqtt]");
 
   FastLED.addLeds<LED_TYPE, LED_DATA_PIN, LED_CLOCK_PIN, LED_RGB>(leds, NUM_LEDS);
@@ -126,11 +125,8 @@ void loop() {
   mqtt_client.loop();
 
   if(millis() > last_mqtt_check + 5000) {
-    if(!mqtt_client.connected()) {
-      mqtt_client.connect(MQTT_UUID, MQTT_USER, MQTT_PASS);
-      mqtt_client.subscribe(MQTT_CMD_TOPIC);
+    if(mqtt_connect(&mqtt_client))
       Serial.println("mqtt reconnect");
-    }
 
     last_mqtt_check = millis();
   }
