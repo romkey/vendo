@@ -13,18 +13,13 @@ static unsigned march() {
   return 1000;
 }
 
-static unsigned fast_march() {
-  march();
-  return 100;
-}
-
-
 static unsigned cylon() {
 
 }
 
 struct animation animations[] = {
   "march", march,
-  "fast march", fast_march,
   "cylon", cylon
 };
+
+struct animation *current_animation  = NULL;
