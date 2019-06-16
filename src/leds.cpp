@@ -16,3 +16,12 @@ void leds_handle() {
   }
 }
 
+void leds_on() {
+}
+
+void leds_off() {
+}
+
+void leds_brightness(uint8_t brightness) {
+}
+
