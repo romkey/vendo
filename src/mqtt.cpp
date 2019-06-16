@@ -10,6 +10,18 @@ bool mqtt_connect(PubSubClient* mqtt_client) {
   return true;
 }
 
+void mqtt_handle() {
+  static unsigned long last_mqtt_check = 0;
+
+  mqtt_client.loop();
+
+  if(millis() > last_mqtt_check + 5000) {
+    if(mqtt_connect(&mqtt_client))
+      Serial.println("mqtt reconnect");
+
+    last_mqtt_check = millis();
+  }
+}
 
 void mqtt_callback(const char*, const byte*, unsigned) {
 }

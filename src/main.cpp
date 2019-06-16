@@ -20,8 +20,10 @@ static WiFiClient wifi_mqtt_client;
 static PubSubClient mqtt_client(wifi_mqtt_client);
 
 static char hostname[sizeof("discoball-%02x%02x%02x") + 1];
+
 #ifdef BUILD_INFO
 
+// CPP weirdness to turn a bare token into a string
 #define STRINGIZE_NX(A) #A
 #define STRINGIZE(A) STRINGIZE_NX(A)
 
@@ -34,8 +36,6 @@ static char build_info[] = "not set";
 // cleared when power cycled or re-flashed
 static RTC_DATA_ATTR int bootCount = 0;
 static RTC_DATA_ATTR int wifi_failures = 0;
-
-CRGB leds[NUM_LEDS];
 
 WiFiMulti wifiMulti;
 
@@ -113,27 +113,15 @@ void setup() {
   mqtt_connect(&mqtt_client);
   Serial.println("[mqtt]");
 
-  FastLED.addLeds<LED_TYPE, LED_DATA_PIN, LED_CLOCK_PIN, LED_RGB>(leds, NUM_LEDS);
-  FastLED.setBrightness(100);
+  leds_setup();
   Serial.println("[leds]");
 }
 
-static unsigned long led_update_time = 0;
-static unsigned long last_mqtt_check = 0;
 
 void loop() {
-  mqtt_client.loop();
-
-  if(millis() > last_mqtt_check + 5000) {
-    if(mqtt_connect(&mqtt_client))
-      Serial.println("mqtt reconnect");
-
-    last_mqtt_check = millis();
-  }
-
+  mqtt_handle();
+  
   ArduinoOTA.handle();
 
-  if(current_animation && millis() > led_update_time) {
-    led_update_time = millis() + (*current_animation->animation)();
-  }
+  leds_handle();
 }
