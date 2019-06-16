@@ -1,4 +1,5 @@
 #include "leds.h"
+#include "animations.h"
 
 CRGB leds[NUM_LEDS];
 

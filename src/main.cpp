@@ -9,15 +9,16 @@
 
 #include <PubSubClient.h>
 
+// needed by BME280 library, not automatically included during PlatformIO build process :(
+#include <Wire.h>
+#include <SPI.h>
+
 #include "config.h"
 #include "leds.h"
 #include "presets.h"
 #include "animations.h"
 #include "mqtt.h"
 #include "hw.h"
-
-static WiFiClient wifi_mqtt_client;
-static PubSubClient mqtt_client(wifi_mqtt_client);
 
 static char hostname[sizeof("discoball-%02x%02x%02x") + 1];
 
@@ -108,9 +109,7 @@ void setup() {
 
   ArduinoOTA.begin();
 
-  mqtt_client.setServer(MQTT_HOST, MQTT_PORT);
-  mqtt_client.setCallback(mqtt_callback);
-  mqtt_connect(&mqtt_client);
+  mqtt_setup();
   Serial.println("[mqtt]");
 
   leds_setup();
