@@ -15,8 +15,9 @@
 #include "leds.h"
 #include "presets.h"
 #include "animations.h"
-#include "mqtt.h"
 #include "ota_updates.h"
+#include "http_server.h"
+#include "mqtt.h"
 #include "hw.h"
 
 char hostname[sizeof("discoball-%02x%02x%02x") + 1];
@@ -82,6 +83,9 @@ void setup() {
   ota_updates_setup();
   Serial.println("[ota_updates]");
 
+  http_server_setup();
+  Serial.println("[http_server]");
+
   mqtt_setup();
   Serial.println("[mqtt]");
 
@@ -91,9 +95,11 @@ void setup() {
 
 
 void loop() {
-  mqtt_handle();
-  
   ota_updates_handle();
 
+  http_server_handle();
+
+  mqtt_handle();
+  
   leds_handle();
 }
