@@ -91,6 +91,8 @@ void setup() {
 
   leds_setup();
   Serial.println("[leds]");
+
+  //  preset_set("white");
 }
 
 

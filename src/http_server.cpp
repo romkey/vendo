@@ -30,8 +30,7 @@ void http_server_setup() {
   server.on("/", handle_root);
   server.on("/on", handle_on);
   server.on("/off", handle_off);
-  server.on("/start", handle_on);
-  server.on("/stop", handle_off);
+  server.on("/stop", handle_stop);
   server.on("/status.json", handle_status);
 
   server.onNotFound([]() {
@@ -67,7 +66,7 @@ static void handle_root() {
     "<title>LED Control</title>"
     "</head><body>"
     "<div class='container'>"
-    "<h1>LED Controls</h1>"
+    "<h1><a href='/'>LED Controls</a></h1>"
     "<form action='/'>"
     "<label for='preset'>Light pattern presets</label>"
     "<select name='preset' class='form-control'>";
@@ -75,7 +74,11 @@ static void handle_root() {
   for(int i = 0; i < presets_length; i++) {
     page += "  <option value='";
     page += presets[i].name;
-    page += "'>";
+    if(server.hasArg("preset") && server.arg("preset") == presets[i].name)
+      page += "' selected>";
+    else
+      page += "'>";
+
     page += presets[i].name;
     page += "</option>";
   }
@@ -90,7 +93,11 @@ static void handle_root() {
   for(int i = 0; i < animations_length; i++) {
     page += "  <option value='";
     page += animations[i].name;
-    page += "'>";
+    if(server.hasArg("animation") && server.arg("animation") == animations[i].name)
+      page += "' selected>";
+    else
+      page += "'>";
+
     page += animations[i].name;
     page += "</option>";
   }
@@ -98,21 +105,22 @@ static void handle_root() {
   page += "</select>"
     "<br/><input type='submit' class='form-control btn btn-primary'>"
     "</form>"
-    "<form action='/'>"
-    "<label for='brightness'>Brightness</label>"
-    "<input type='number' id='brightness' name='brightness' min='0' max='100'>"
-    "</form>"
+    "<a href='/stop' class='btn btn-info'>Stop Animation</a><a href='/start' class='btn btn-info'>Start Animation</a>"
+    //    "<form action='/'>"
+    //    "<label for='brightness'>Brightness</label>"
+    //    "<input type='number' id='brightness' name='brightness' min='0' max='100'>"
+    //    "</form>"
     "<form action='/'>"
     "<label for='brightness'>Animation speed</label>"
     "<input type='text' id='speed' name='speed' size='4' placeholder='% speed'>"
     "</form>"
     "<form action='/' class='form-inline'>"
-    "<div id='pick-a-color' class='input-group' title='Using format option'>"
-    "<input name='rgb' type='text' class='form-control' value='F0F0F0' />"
-    "<span class='input-group-append'>"
-    "<span class='input-group-text colorpicker-input-addon'><i></i></span>"
-    "</span>"
-    "</div>"
+    //    "<div id='pick-a-color' class='input-group' title='Using format option'>"
+    //    "<input name='rgb' type='text' class='form-control' value='F0F0F0' />"
+    //    "<span class='input-group-append'>"
+    //    "<span class='input-group-text colorpicker-input-addon'><i></i></span>"
+    //    "</span>"
+    //    "</div>"
     "<label for='r'>Red </label><input type='number' id='r' name='r' min='0' max='255' class='form-control'>"
     "<label for='g'>Green </label><input type='number' id='g' name='g' min='0' max='255' class='form-control'>"
     "<label for='b'>Blue </label><input type='number' id='b' name='b' min='0' max='255' class='form-control'>"
@@ -127,11 +135,6 @@ static void handle_root() {
     "<script>"
     "$(function () {"
     "  $('#pick-a-color').colorpicker({ useAlpha: false, horizontal: true, useHashPrefix: false });"
-    "  var url = new URL(window.location.href);"
-    "  var preset = url.searchParams.get('preset');"
-    "  if(preset) { $('select[name=\"preset\"] option[value=' + preset + ']').prop('selected', true); };"
-    "  var animation = url.searchParams.get('animation');"
-    "  if(animation) { $('select[name=\"animation\"] option[value=' + animation + ']').prop('selected', true); };"
     "});"
     "</script>"
     "</body>"
@@ -142,15 +145,24 @@ static void handle_root() {
 
 static void handle_on() {
   leds_on();
+  server.send(302, "text/plain", "/");
 }
 
 static void handle_off() {
-  leds_off();
+  preset_set("off");
+  animation_stop();
+  server.send(302, "text/plain", "/");
 }
 
 static void handle_start() {
+  animation_start();
+  server.send(302, "text/plain", "/");
 }
 
+static void handle_stop() {
+  animation_stop();
+  server.send(302, "text/plain", "/");
+}
 
 static void handle_status() {
 }

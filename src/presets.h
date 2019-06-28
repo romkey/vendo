@@ -1,3 +1,7 @@
+#pragma once
+
+#include "leds.h"
+
 typedef struct preset {
   const char* name;
   void (*preset)();  } preset_t;

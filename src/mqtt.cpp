@@ -38,16 +38,24 @@ void mqtt_handle() {
 }
 
 void mqtt_callback(const char* topic, const byte* payload, unsigned int length) {
-  char command[length + 1];
+  char command_buffer[length + 1];
+  char* command = command_buffer;
 
-  memcpy(command, payload, length);
+  memcpy(command_buffer, payload, length);
   command[length] = '\0';
 
+  // command is meant to be a valid json string, so get rid of the quotes
+  if(command[0] == '"' && command[length-1] == '"') {
+    command[length-1] = '\0';
+    command += 1;
+  }
 
   char buffer[length + 30];
   snprintf(buffer, length+30, "{ \"cmd\": \"%s\" }", command);
 
   mqtt_client.publish("/status", buffer);
+
+  Serial.printf("command %s\n", command);
 
   if(strcmp(command, "restart") == 0) {
     ESP.restart();
@@ -70,6 +78,60 @@ void mqtt_callback(const char* topic, const byte* payload, unsigned int length) 
 
   if(strcmp(command, "start") == 0) {
     animation_start();
+    return;
+  }
+
+  if(strncmp(command, "speed ", 6) == 0) {
+    Serial.printf("speed %s\n", &command[6]);
+    animation_speed(atoi(&command[6]));
+    return;
+  }
+
+  if(strncmp(command, "bright ", 7) == 0) {
+    leds_brightness(atoi(&command[7]));
+    return;
+  }
+
+  if(strncmp(command, "rgb ", 4) == 0) {
+    char temp[3] = "xx";
+    uint8_t red, green, blue;
+
+    Serial.printf("RGB %s\n", &command[4]);
+    temp[0] = command[4];
+    temp[1] = command[5];
+    red = strtol(temp, 0, 16);
+
+    temp[0] = command[6];
+    temp[1] = command[7];
+    green = strtol(temp, 0, 16);
+
+    temp[0] = command[8];
+    temp[1] = command[9];
+    blue = strtol(temp, 0, 16);
+
+    Serial.printf("rgb red %u, green %u, blue %u\n", red, green, blue);
+    //    leds_fill(red, green, blue);
+  }
+
+  if(strncmp(command, "preset ", 7) == 0) {
+    Serial.println("got preset");
+    Serial.println(&command[7]);
+
+    if(preset_set(&command[7]))
+      return;
+
+    mqtt_client.publish("/leds/$error", command);
+    return;
+  }
+
+  if(strncmp(command, "animation ", 10) == 0) {
+    Serial.println("got animation");
+    Serial.println(&command[10]);
+
+    if(animation_set(&command[10]))
+      return;
+
+    mqtt_client.publish("/leds/$error", command);
     return;
   }
 }

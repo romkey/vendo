@@ -1,3 +1,5 @@
+#pragma once
+
 #include <FastLED.h>
 
 #include "hw.h"
@@ -7,5 +9,8 @@ void leds_handle();
 void leds_on();
 void leds_off();
 void leds_brightness(uint8_t brightness); // 0 - 100%
+
+void leds_fill(uint8_t red, uint8_t green, uint8_t blue);
+void leds_fill(CRGB);
 
 extern CRGB leds[NUM_LEDS];
