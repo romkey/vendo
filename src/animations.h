@@ -2,7 +2,7 @@
 
 typedef struct animation {
   const char* name;
-  unsigned (*animation)();
+  unsigned (*animation)(bool init);
 } animation_t;
 
 extern animation_t animations[];

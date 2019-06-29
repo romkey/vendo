@@ -55,8 +55,12 @@ static void handle_root() {
 
   if(server.hasArg("brightness"))
     leds_brightness(atoi(server.arg("brightness").c_str()));
-  if(server.hasArg("speed"))
-    animation_speed(atoi(server.arg("speed").c_str()));
+  if(server.hasArg("speed")) {
+    float speed = server.arg("speed").toFloat();
+
+    if(speed)
+      animation_speed(speed);
+  }
 
   String page = "<html><head>"
     "<meta charset='utf-8'>"
@@ -105,14 +109,14 @@ static void handle_root() {
   page += "</select>"
     "<br/><input type='submit' class='form-control btn btn-primary'>"
     "</form>"
-    "<a href='/stop' class='btn btn-info'>Stop Animation</a><a href='/start' class='btn btn-info'>Start Animation</a>"
+    "<a href='/stop' class='btn btn-info'>Stop Animation</a>&nbsp;<a href='/start' class='btn btn-info'>Start Animation</a>"
     //    "<form action='/'>"
     //    "<label for='brightness'>Brightness</label>"
     //    "<input type='number' id='brightness' name='brightness' min='0' max='100'>"
     //    "</form>"
-    "<form action='/'>"
-    "<label for='brightness'>Animation speed</label>"
-    "<input type='text' id='speed' name='speed' size='4' placeholder='% speed'>"
+    "<form action='/' class='form'>"
+    "<label for='brightness'>Animation speed factor (speed * factor - 0.0 - ?)</label>"
+    "<input type='text' id='speed' name='speed' size='4'>"
     "</form>"
     "<form action='/' class='form-inline'>"
     //    "<div id='pick-a-color' class='input-group' title='Using format option'>"

@@ -37,6 +37,10 @@ void mqtt_handle() {
   }
 }
 
+void mqtt_publish(const char* topic, const char* payload) {
+  mqtt_client.publish(topic, payload, true);
+}
+
 void mqtt_callback(const char* topic, const byte* payload, unsigned int length) {
   char command_buffer[length + 1];
   char* command = command_buffer;
@@ -83,7 +87,7 @@ void mqtt_callback(const char* topic, const byte* payload, unsigned int length) 
 
   if(strncmp(command, "speed ", 6) == 0) {
     Serial.printf("speed %s\n", &command[6]);
-    animation_speed(atoi(&command[6]));
+    animation_speed(String(&command[6]).toFloat());
     return;
   }
 

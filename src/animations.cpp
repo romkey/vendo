@@ -1,8 +1,11 @@
 #include "leds.h"
 #include "animations.h"
 
-static unsigned march() {
+static unsigned march(bool init) {
   CRGB last = leds[0];
+
+  if(init)
+    return 0;
 
   for(int i = 0; i < NUM_LEDS - 1 ; i++)
     leds[i] = leds[i+1];
@@ -13,17 +16,16 @@ static unsigned march() {
   return 1000;
 }
 
-static unsigned throb() {
+static unsigned throb(bool init) {
   static uint8_t brightness = 255;
   static int8_t direction = -1;
   static CRGB old_leds[NUM_LEDS];
-  static bool first = true;
 
-  if(first) {
+  if(init) {
     for(int i = 0; i < NUM_LEDS; i++)
       old_leds[i] = leds[i];
 
-    first = false;
+    return 0;
   }
 
   for(int i = 0; i < NUM_LEDS; i++) {
@@ -44,7 +46,7 @@ static unsigned throb() {
   return 10;
 }
 
-static unsigned invert() {
+static unsigned invert(bool init) {
   for(int i = 0; i < NUM_LEDS; i++)
     leds[i] = -leds[i];
 
@@ -53,7 +55,7 @@ static unsigned invert() {
   return 1000;
 }
 
-static unsigned blink() {
+static unsigned blink(bool init) {
   static CRGB old_leds[NUM_LEDS];
   static bool onoff = false;
 
@@ -76,14 +78,16 @@ static unsigned blink() {
   return 1000;
 }
 
-static unsigned alternating_blink() {
+static unsigned alternating_blink(bool init) {
   static CRGB old_leds[NUM_LEDS];
   static uint8_t offset = 0;
-  static bool first = true;
 
-  if(first)
+  if(init) {
     for(int i = 0; i < NUM_LEDS; i++)
       old_leds[i] = leds[i];
+
+    return 0;
+  }
 
   for(int i = 0; i < NUM_LEDS; i++) {
     CRGB temp = leds[i];
@@ -116,6 +120,7 @@ static float speed = 1;
 static bool running = true;
 
 void animation_start() {
+  (*current_animation->animation)(true);
   running = true;
 }
 
@@ -129,7 +134,7 @@ void animation_speed(float desired_speed) {
 
 unsigned animate() {
   if(running)
-    return (unsigned)((*current_animation->animation)() / speed);
+    return (unsigned)((*current_animation->animation)(false) / speed);
   else
     return 10;
 }

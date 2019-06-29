@@ -18,6 +18,11 @@
 #include "ota_updates.h"
 #include "http_server.h"
 #include "mqtt.h"
+
+#ifdef HAS_BME280
+#include "bme280.h"
+#endif
+
 #include "hw.h"
 
 char hostname[sizeof("discoball-%02x%02x%02x") + 1];
@@ -28,9 +33,9 @@ char hostname[sizeof("discoball-%02x%02x%02x") + 1];
 #define STRINGIZE_NX(A) #A
 #define STRINGIZE(A) STRINGIZE_NX(A)
 
-static char build_info[] = STRINGIZE(BUILD_INFO);
+char build_info[] = STRINGIZE(BUILD_INFO);
 #else
-static char build_info[] = "not set";
+char build_info[] = "not set";
 #endif
 
 // used to store persistent data across crashes/reboots
@@ -92,7 +97,18 @@ void setup() {
   leds_setup();
   Serial.println("[leds]");
 
-  //  preset_set("white");
+#ifdef HAS_BME280
+  bme280_setup();
+#endif
+
+#ifdef DISCOBALL_DISCO_1
+  preset_set("pride");
+  animation_set("march");
+#endif
+
+#ifdef DISCOBALL_CTRLH_1
+  preset_set("white");
+#endif
 }
 
 
@@ -104,4 +120,8 @@ void loop() {
   mqtt_handle();
   
   leds_handle();
+
+#ifdef HAS_BME280
+  bme280_handle();
+#endif
 }
