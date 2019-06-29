@@ -58,8 +58,14 @@ void setup() {
 
   WiFi.macAddress(mac_address);
   snprintf(hostname, sizeof(hostname), "discoball-%02x%02x%02x", (int)mac_address[3], (int)mac_address[4], (int)mac_address[5]);
-  Serial.printf("Hostname is %s\n", hostname);
-
+  Serial.printf("Hostname: %s\n", hostname);
+  Serial.printf("MAC address: %02x:%02x:%02x:%02x:%02x:%02x\n",
+		mac_address[0],
+		mac_address[1],
+		mac_address[2],
+		mac_address[3],
+		mac_address[4],
+		mac_address[5]);
   WiFi.setHostname(hostname);
 
   wifiMulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);

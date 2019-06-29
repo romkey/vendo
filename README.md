@@ -8,6 +8,7 @@ The hardware is based on an ESP32 which uses a level shifter to drive an LED str
 
 ## Software
 
+The software is written using the Arduino Core for the ESP32. It's structured to build with [PlatformIO](https://platformio.org/), not the Arduino IDE.
 
 ## Control Interface
 

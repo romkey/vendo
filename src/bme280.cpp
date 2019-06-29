@@ -17,10 +17,15 @@ static Adafruit_BME280 bme280;
 static Uptime uptime;
 
 void bme280_setup() {
-  bme280.begin();
+  if(!bme280.begin(0x76))
+    Serial.println("BME280 not found");
+  else
+    Serial.println("[bme280]");
 }
 
 static unsigned long next_read = 0;
+
+extern char *build_info, *hostname;
 
 void bme280_handle() {
   if(millis() < next_read)
@@ -30,14 +35,16 @@ void bme280_handle() {
   char buf[BUFFER_SIZE];
   IPAddress local = WiFi.localIP();
 
-  extern char *build_info, *hostname;
-
-  snprintf(buf, BUFFER_SIZE, "{ \"id\": %s, \"system\": {\"name\": \"%s\", \"build\": \"%s\", \"freeheap\": %d, \"uptime\": %lu, \"ip\": \"%d.%d.%d.%d\", \"rssi\": %d }, \"environment\": { \"temperature\": %.1f, \"humidity\": %.1f, \"pressure\": %.1f } }",
+  snprintf(buf, BUFFER_SIZE, "{ \"id\": \"%s\", \"system\": {\"name\": \"%s\", \"build\": \"%s\", \"freeheap\": %d, \"uptime\": %lu, \"ip\": \"%d.%d.%d.%d\", \"rssi\": %d }, \"environment\": { \"temperature\": %.1f, \"humidity\": %.1f, \"pressure\": %.1f } }",
 	   MQTT_UUID,
 	   hostname, build_info, ESP.getFreeHeap(), uptime.uptime()/1000, local[0], local[1], local[2], local[3], WiFi.RSSI(),
 	   bme280.readTemperature(), bme280.readHumidity(), bme280.readPressure());	   
 
-  mqtt_publish(MQTT_PUBLISH_TOPIC, buf);
+#ifdef VERBOSE
+  Serial.println(buf);
+#endif
+
+  mqtt_publish(BME280_MQTT_PUBLISH_TOPIC, buf);
 
   next_read = millis() + BME280_UPDATE_DELAY;
 }
