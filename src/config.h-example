@@ -1,0 +1,67 @@
+#pragma once
+
+// Wifi configuration
+#define WIFI_SSID1     ""
+#define WIFI_PASSWORD1 ""
+
+#define WIFI_SSID2     ""
+#define WIFI_PASSWORD2 ""
+
+#define WIFI_SSID3     ""
+#define WIFI_PASSWORD3 ""
+
+// balcony LEDs
+#define DISCOBALL_DISCO_1
+// dev LEDs
+// #define DISCOBALL_DISCO_2
+// vending machine
+// #define DISCOBALL_CTRLH_1
+// 100 LED strand
+// #define DISCOBALL_CTRLH_2
+
+// MQTT configuration is provided by HomeBus provisioning server or manually
+#ifdef DISCOBALL_DISCO_1
+#define MQTT_HOST ""
+#define MQTT_PORT 1883
+#define MQTT_USER ""
+#define MQTT_PASS ""
+#define MQTT_UUID ""
+#endif
+
+#ifdef DISCOBALL_DISCO_2
+#define MQTT_HOST ""
+#define MQTT_PORT 1883
+#define MQTT_USER ""
+#define MQTT_PASS ""
+#define MQTT_UUID ""
+#endif
+
+#ifdef DISCOBALL_CTRLH_1
+#define MQTT_HOST ""
+#define MQTT_PORT 1883
+
+#define MQTT_USER ""
+#define MQTT_PASS ""
+#define MQTT_UUID ""
+
+#define HAS_BME280
+#define BME280_UPDATE_DELAY 60*1000
+#define BME280_MQTT_PUBLISH_TOPIC "/vendo"
+#endif
+
+#ifdef DISCOBALL_CTRLH_2
+#define MQTT_HOST ""
+#define MQTT_PORT 1883
+
+#define MQTT_USER ""
+#define MQTT_PASS ""
+#define MQTT_UUID ""
+#endif
+
+#define MQTT_CMD_TOPIC "/leds/cmd"
+
+#define WIFI_PROVISION_UUID ""
+
+#define VERBOSE
+
+// MQTT broker configuration

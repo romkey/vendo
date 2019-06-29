@@ -37,7 +37,7 @@ void bme280_handle() {
 	   hostname, build_info, ESP.getFreeHeap(), uptime.uptime()/1000, local[0], local[1], local[2], local[3], WiFi.RSSI(),
 	   bme280.readTemperature(), bme280.readHumidity(), bme280.readPressure());	   
 
-  mqtt_publish("/vendo", buf);
+  mqtt_publish(MQTT_PUBLISH_TOPIC, buf);
 
   next_read = millis() + BME280_UPDATE_DELAY;
 }
