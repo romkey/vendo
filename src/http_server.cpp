@@ -53,6 +53,16 @@ static void handle_root() {
   if(server.hasArg("sequence"))
     animation_set(server.arg("animation").c_str());
 
+  if(server.hasArg("r") && server.hasArg("g") && server.hasArg("b")) {
+    uint8_t red, green, blue;
+
+    red = strtol(server.arg("r").c_str(), 0, 16);
+    green = strtol(server.arg("g").c_str(), 0, 16);
+    blue = strtol(server.arg("b").c_str(), 0, 16);
+
+    preset_rgb(red, green, blue);
+  }
+
   if(server.hasArg("brightness"))
     leds_brightness(atoi(server.arg("brightness").c_str()));
   if(server.hasArg("speed")) {

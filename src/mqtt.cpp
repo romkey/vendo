@@ -112,7 +112,7 @@ void mqtt_callback(const char* topic, const byte* payload, unsigned int length) 
     blue = strtol(temp, 0, 16);
 
     Serial.printf("rgb red %u, green %u, blue %u\n", red, green, blue);
-    //    leds_fill(red, green, blue);
+    preset_rgb(red, green, blue);
   }
 
   if(strncmp(command, "preset ", 7) == 0) {

@@ -9,5 +9,6 @@ typedef struct preset {
 extern preset_t presets[];
 extern unsigned presets_length;
 
+void preset_rgb(uint8_t red, uint8_t green, uint8_t blue);
 void preset_set(preset_t*);
 bool preset_set(const char*);

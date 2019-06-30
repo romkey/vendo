@@ -134,3 +134,6 @@ bool preset_set(const char* name) {
   return false;
 }
 
+void preset_rgb(uint8_t red, uint8_t green, uint8_t blue) {
+  leds_fill(CRGB(red, green, blue));
+}
