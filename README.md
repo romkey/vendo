@@ -84,6 +84,12 @@ Animation routines are called from a loop in leds_handle().
 
 They're kept in the animations array along with human-friendly names for them.
 
+### Firmware updates
+
+Vendo supports over-the-air (OTA) updates. Using PlatformIO you can build and install an update:
+
+    platformio run -t upload --upload-port NAME-OR-IP-ADDRESS
+
 
 ## License
 
