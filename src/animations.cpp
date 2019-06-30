@@ -1,6 +1,45 @@
 #include "leds.h"
 #include "animations.h"
 
+/*
+ * ANIMATIONS
+ *
+ * Animations are subroutines statically scoped to this file which take one argument,
+ * indicating whether they should initialize themselves.
+ *
+ * Init will be called when the animation is first selected. On init the animation
+ * routine should set up any state it needs in order to perform the animation (like
+ * record the state of all the LEDs or set any state variables) and return.
+ * 
+ * When init is false, the animation routine should perform one frame of animation,
+ * do any housekeeping it needs to, and return the number of milliseconds until the next
+ * frame of animation.
+ *
+ * Animations should call FastLED.show() when they're ready to. The animation loop doesn't
+ * do this for them.
+ *
+ * Animations should avoid calling delay() when possible and instead maintain state using
+ * state variables and return the number of milliseconds till they need to resume. This
+ * allows the code to also perform operations involving the network stack: service
+ * commands via the web interface and MQTT and perform over-the-air-updates.
+ *
+ * Network activity will almost certainly disrupt the timing of an animation, but we
+ * expect network activity to normally only happen when the user initiates a command, which
+ * would change the presets or animation anyway.
+ *
+ * One exception is temperature updates - the code optionally supports periodically posting
+ * the value of a temperature sensor to MQTT. If this is too disruptive of animations then
+ * change the posting frequency to be less often.
+ *
+ * Animations have a speed factor - a floating point number which the frame delay is
+ * divided by. Normally this is 1.0. To double the animation's speed, the speed factor
+ * would be 2. To halve it, the speed factor would be 0.5. 
+ *
+ * Animation routines are called from a loop in leds_handle().
+ *
+ * They're kept in the animations array along with human-friendly names for them.
+ */
+
 static unsigned march(bool init) {
   CRGB last = leds[0];
 

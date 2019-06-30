@@ -57,8 +57,6 @@ void mqtt_callback(const char* topic, const byte* payload, unsigned int length) 
   char buffer[length + 30];
   snprintf(buffer, length+30, "{ \"cmd\": \"%s\" }", command);
 
-  mqtt_client.publish("/status", buffer);
-
   Serial.printf("command %s\n", command);
 
   if(strcmp(command, "restart") == 0) {

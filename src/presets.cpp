@@ -2,36 +2,62 @@
 #include "animations.h"
 #include "presets.h"
 
+/*
+ * PRESETS
+ *
+ * Presets sinply set the LEDs to a selected color or pattern.
+ *
+ * The preset routine should call FastLED.show() when it's done.
+ *
+ * Setting a preset stops the current animation.
+ */
+
 static void white() {
   leds_fill(CRGB::White);
+  
+  FastLED.show();
 }
 
 static void pink() {
   leds_fill(CRGB::Pink);
+
+  FastLED.show();
 }
 
 static void red() {
   leds_fill(CRGB::Red);
+
+  FastLED.show();
 }
 
 static void green() {
   leds_fill(CRGB::Green);
+  
+  FastLED.show();
 }
 
 static void blue() {
   leds_fill(CRGB::Blue);
+  
+  FastLED.show();
 }
 
 static void yellow() {
     leds_fill(CRGB::Yellow);
+  
+  FastLED.show();
 }
 
 static void orange() {
-    leds_fill(CRGB::Orange);
+  leds_fill(CRGB::Orange);
+
+  FastLED.show();
 }
 
 static void purple() {
-    leds_fill(CRGB::Purple);
+  leds_fill(CRGB::Purple);
+
+  FastLED.show();
 }
 
 static void pride() {
