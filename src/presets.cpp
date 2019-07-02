@@ -1,3 +1,4 @@
+#include "config.h"
 #include "leds.h"
 #include "animations.h"
 #include "presets.h"
@@ -84,6 +85,24 @@ static void rainbow() {
   FastLED.show();
 }
 
+static void independence() {
+  static CRGB independence[3] = { CRGB::Red, CRGB::White, CRGB::Blue };
+
+  for(int i=0; i<NUM_LEDS; i++)
+    leds[i] = independence[i % 3];
+
+  FastLED.show();
+}
+
+static void mango_parfait() {
+  static CRGB parfait[2] = { CRGB::Orange, CRGB::White };
+
+  for(int i=0; i<NUM_LEDS; i++)
+    leds[i] = parfait[i % 2];
+
+  FastLED.show();
+}
+
 static void off() {
   for(int i = 0; i < NUM_LEDS; i++)
 	leds[0] = 0;
@@ -92,17 +111,19 @@ static void off() {
 }
 
 preset_t presets[] = {
-  "white", white,
-  "red", red,
-  "green", green,
   "blue", blue,
-  "yellow", yellow,
+  "green", green,
   "orange", orange,
-  "purple", purple,
   "pink", pink,
+  "purple", purple,
+  "red", red,
+  "white", white,
+  "yellow", yellow,
+  "independence", independence,
+  "mango parfait", mango_parfait,
   "pride", pride,
-  "xmas", xmas,
   "rainbow", rainbow,
+  "xmas", xmas,
   "off", off
 };
 

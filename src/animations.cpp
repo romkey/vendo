@@ -1,3 +1,4 @@
+#include "config.h"
 #include "leds.h"
 #include "animations.h"
 
@@ -39,6 +40,72 @@
  *
  * They're kept in the animations array along with human-friendly names for them.
  */
+
+
+/****
+ **** definitions for MasterTwinkle by https://gist.github.com/kriegsman/88954aae22b03a664081
+ ****/
+#define PEAK_COLOR       CRGB(64,0,64)
+
+#define DELTA_COLOR_UP   CRGB(4,0,4)
+
+// Amount to decrement the color by each loop as it gets dimmer:
+#define DELTA_COLOR_DOWN CRGB(1,0,1)
+
+// Chance of each pixel starting to brighten up.  
+// 1 or 2 = a few brightening pixels at a time.
+// 10 = lots of pixels brightening at a time.
+#define CHANCE_OF_TWINKLE 1
+
+enum { SteadyDim, GettingBrighter, GettingDimmerAgain };
+
+static unsigned twinkle(bool init) {
+  static uint8_t PixelState[NUM_LEDS];
+  static CRGB original_leds[NUM_LEDS];
+
+  if(init) {
+    for(int i = 0; i < NUM_LEDS; i++) {
+      PixelState[i] = SteadyDim;
+      original_leds[i] = leds[i];
+    }
+
+    //    fill_solid( leds, NUM_LEDS, BASE_COLOR);
+
+    return 0;
+  }
+
+  for( uint16_t i = 0; i < NUM_LEDS; i++) {
+    if( PixelState[i] == SteadyDim) {
+      // this pixels is currently: SteadyDim
+      // so we randomly consider making it start getting brighter
+      if( random8() < CHANCE_OF_TWINKLE) {
+        PixelState[i] = GettingBrighter;
+      }
+      
+    } else if( PixelState[i] == GettingBrighter ) {
+      // this pixels is currently: GettingBrighter
+      // so if it's at peak color, switch it to getting dimmer again
+      if( leds[i] >= PEAK_COLOR ) {
+        PixelState[i] = GettingDimmerAgain;
+      } else {
+        // otherwise, just keep brightening it:
+        leds[i] += DELTA_COLOR_UP;
+      }
+      
+    } else { // getting dimmer again
+      // this pixels is currently: GettingDimmerAgain
+      // so if it's back to base color, switch it to steady dim
+      if( leds[i] <= original_leds[i] ) {
+        leds[i] = original_leds[i]; // reset to exact base color, in case we overshot
+        PixelState[i] = SteadyDim;
+      } else {
+        // otherwise, just keep dimming it down:
+        leds[i] -= DELTA_COLOR_DOWN;
+      }
+    }
+  }
+}
+
 
 static unsigned march(bool init) {
   CRGB last = leds[0];
@@ -148,7 +215,8 @@ animation_t animations[] = {
   "alternating blink", alternating_blink,
   "invert", invert,
   "march", march,
-  "throb", throb
+  "throb", throb,
+  "twinkle", twinkle
 };
 
 unsigned animations_length = sizeof(animations)/sizeof(animation_t);

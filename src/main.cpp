@@ -115,6 +115,11 @@ void setup() {
 #ifdef DISCOBALL_CTRLH_1
   preset_set("white");
 #endif
+
+#ifdef DISCOBALL_CTRLH_1
+  preset_set("pride");
+  animation_set("march");
+#endif
 }
 
 

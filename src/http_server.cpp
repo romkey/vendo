@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "http_server.h"
 
 #include "leds.h"
