@@ -103,6 +103,16 @@ static void mango_parfait() {
   FastLED.show();
 }
 
+
+static void reverse_watermelon() {
+  static CRGB watermelon[4] = { CRGB::Green, CRGB::Green, CRGB::Green, CRGB::Red };
+
+  for(int i=0; i<NUM_LEDS; i++)
+    leds[i] = watermelon[i % 4];
+
+  FastLED.show();
+}
+
 static void off() {
   for(int i = 0; i < NUM_LEDS; i++)
 	leds[0] = 0;
@@ -123,6 +133,7 @@ preset_t presets[] = {
   "mango parfait", mango_parfait,
   "pride", pride,
   "rainbow", rainbow,
+  "reverse watermelon", reverse_watermelon,
   "xmas", xmas,
   "off", off
 };
