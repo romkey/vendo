@@ -104,6 +104,9 @@ static unsigned twinkle(bool init) {
       }
     }
   }
+
+  FastLED.show();
+  return 10;
 }
 
 

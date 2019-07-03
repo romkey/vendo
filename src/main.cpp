@@ -116,9 +116,10 @@ void setup() {
   preset_set("white");
 #endif
 
-#ifdef DISCOBALL_CTRLH_1
-  preset_set("pride");
+#ifdef DISCOBALL_CTRLH_2
+  preset_set("rainbow");
   animation_set("march");
+  animation_speed(3);
 #endif
 }
 
