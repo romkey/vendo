@@ -10,7 +10,7 @@ void leds_setup() {
 #else
   FastLED.addLeds<LED_TYPE, LED_DATA_PIN, LED_RGB>(leds, NUM_LEDS);
 #endif
-  FastLED.setBrightness(100);
+  FastLED.setBrightness(255);
 }
 
 void leds_handle() {

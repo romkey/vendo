@@ -90,7 +90,7 @@ static void handle_root() {
   for(int i = 0; i < presets_length; i++) {
     page += "  <option value='";
     page += presets[i].name;
-    if(server.hasArg("preset") && server.arg("preset") == presets[i].name)
+    if(&presets[i] == current_preset)
       page += "' selected>";
     else
       page += "'>";
@@ -109,7 +109,7 @@ static void handle_root() {
   for(int i = 0; i < animations_length; i++) {
     page += "  <option value='";
     page += animations[i].name;
-    if(server.hasArg("animation") && server.arg("animation") == animations[i].name)
+    if(&animations[i] == current_animation)
       page += "' selected>";
     else
       page += "'>";

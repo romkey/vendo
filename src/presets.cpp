@@ -139,10 +139,13 @@ preset_t presets[] = {
 };
 
 unsigned presets_length = sizeof(presets)/sizeof(preset_t);
+preset_t *current_preset;
 
 void preset_set(preset_t *preset) {
   if(preset && preset->preset)
     (*preset->preset)();
+
+  current_preset = preset;
 }
 
 preset_t* preset_lookup(const char* name) {
