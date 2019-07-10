@@ -6,9 +6,15 @@ This repo has the hardware plans and code for the lighting inside the vending ma
 
 The hardware is based on an ESP32 which uses a level shifter to drive an LED strip. We used an LPD8806-based strip, but the code can work with any strip that the FastLED library supports. Some LED strips won't even need a level shifter because the LED controllers will handle 3.3V signals.
 
+I chose the ESP32 because it's cheap (about $5-6 from AliExpress, or twice that on Amazon) and has a lot of head room. It has two CPU cores; one runs the network stack and the other runs the Arduino applicaion. It should be able to be responsive to the network while still running smooth animations. With some minor changes to the network code, vendo could also easily run on an ESP32 or on an Arduino.
+
+i've designed a simple printed circuit board called a "discoball" which has all the hardware you'll need to do this. It's very simple. I'm still debugging it and will publish it in its own repository soon.
+
 ## Software
 
-The software is written using the Arduino Core for the ESP32. It's structured to build with [PlatformIO](https://platformio.org/), not the Arduino IDE.
+The software is written using the Arduino Core for the ESP32. It's structured to build with [PlatformIO](https://platformio.org/), not the Arduino IDE. PlatformIO changes the build process but shouldn't affect the actual code at all. I use PlatformIO because it's fast, much less cumbersome than the Arduino IDE, and has good library management. It's also (recently) fully open source.
+
+If you want to build this project using the Arduino IDE, and rename `src/main.cpp` to `src/vendo.ino` and the `src` directory to `vendo` and manually install the libraries that are listed in`platformio.ini`.
 
 ## Control Interface
 
@@ -41,7 +47,7 @@ The controller also uses a BME280 to monitor the temperature inside the vending 
 
 ### Presets
 
- Presets sinply set the LEDs to a selected color or pattern.
+ Presets simply set the LEDs to a selected color or pattern.
 
 The preset routine should call FastLED.show() when it's done.
 
@@ -60,10 +66,10 @@ When init is false, the animation routine should perform one frame of animation,
 do any housekeeping it needs to, and return the number of milliseconds until the next
 frame of animation.
 
-Animations should call FastLED.show() when they're ready to. The animation loop doesn't
+Animations should call `FastLED.show()` when they're ready to. The animation loop doesn't
 do this for them.
 
-Animations should avoid calling delay() when possible and instead maintain state using
+Animations should avoid calling `delay()` when possible and instead should maintain state using
 state variables and return the number of milliseconds till they need to resume. This
 allows the code to also perform operations involving the network stack: service
 commands via the web interface and MQTT and perform over-the-air-updates.
@@ -80,7 +86,7 @@ Animations have a speed factor - a floating point number which the frame delay i
 divided by. Normally this is 1.0. To double the animation's speed, the speed factor
 would be 2. To halve it, the speed factor would be 0.5. 
 
-Animation routines are called from a loop in leds_handle().
+Animation routines are called from a loop in `leds_handle()`.
 
 They're kept in the animations array along with human-friendly names for them.
 

@@ -121,7 +121,7 @@ static void handle_root() {
   page += "</select>"
     "<br/><input type='submit' class='form-control btn btn-primary'>"
     "</form>"
-    "<a href='/stop' class='btn btn-info'>Stop Animation</a>&nbsp;<a href='/start' class='btn btn-info'>Start Animation</a>"
+    "<a href='/stop' class='btn btn-info'>Stop Animation</a>"
     //    "<form action='/'>"
     //    "<label for='brightness'>Brightness</label>"
     //    "<input type='number' id='brightness' name='brightness' min='0' max='100'>"
@@ -167,7 +167,8 @@ static void handle_on() {
 static void handle_off() {
   preset_set("off");
   animation_stop();
-  server.send(302, "text/plain", "/");
+  server.sendHeader("Location", "/");
+  server.send(302);
 }
 
 static void handle_start() {
@@ -177,7 +178,8 @@ static void handle_start() {
 
 static void handle_stop() {
   animation_stop();
-  server.send(302, "text/plain", "/");
+  server.sendHeader("Location", "/");
+  server.send(302);
 }
 
 static void handle_status() {

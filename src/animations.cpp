@@ -214,8 +214,8 @@ static unsigned alternating_blink(bool init) {
 }
 
 animation_t animations[] = {
-  "blink", blink,
   "alternating blink", alternating_blink,
+  "blink", blink,
   "invert", invert,
   "march", march,
   "throb", throb,
