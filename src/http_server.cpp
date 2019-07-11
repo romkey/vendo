@@ -127,7 +127,7 @@ static void handle_root() {
     //    "<input type='number' id='brightness' name='brightness' min='0' max='100'>"
     //    "</form>"
     "<form action='/' class='form'>"
-    "<label for='brightness'>Animation speed factor (speed * factor - 0.0 - ?)</label>"
+    "<label for='brightness'>Animation speed factor (0.5 = half speed, 2 = double speed)</label>"
     "<input type='text' id='speed' name='speed' size='4'>"
     "</form>"
     "<form action='/' class='form-inline'>"
