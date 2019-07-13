@@ -42,7 +42,8 @@
  */
 
 
-/****
+#if 0
+/**** not working, so removed for now
  **** definitions for MasterTwinkle by https://gist.github.com/kriegsman/88954aae22b03a664081
  ****/
 #define PEAK_COLOR       CRGB(64,0,64)
@@ -108,6 +109,7 @@ static unsigned twinkle(bool init) {
   FastLED.show();
   return 10;
 }
+#endif
 
 
 static unsigned march(bool init) {
@@ -199,16 +201,16 @@ static unsigned alternating_blink(bool init) {
   }
 
   for(int i = 0; i < NUM_LEDS; i++) {
-    CRGB temp = leds[i];
-
-    leds[i] = old_leds[i];
-    old_leds[i] = temp;
+    if(i + offset % 2)
+      leds[i] = old_leds[i];
+    else
+      leds[i] = 0;
   }
+
+  FastLED.show();
 
   offset +=1;
   offset %= 2;
-
-  FastLED.show();
 
   return 1000;
 }
@@ -218,8 +220,7 @@ animation_t animations[] = {
   "blink", blink,
   "invert", invert,
   "march", march,
-  "throb", throb,
-  "twinkle", twinkle
+  "throb", throb
 };
 
 unsigned animations_length = sizeof(animations)/sizeof(animation_t);

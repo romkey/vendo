@@ -6,6 +6,8 @@
 #include "presets.h"
 #include "animations.h"
 
+#include "bme280.h"
+
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
@@ -142,8 +144,14 @@ static void handle_root() {
     "<label for='b'>Blue </label><input type='number' id='b' name='b' min='0' max='255' class='form-control'>"
     "<br/><input type='submit' class='form-control btn btn-primary'>"
     "</form>"
+#ifdef HAS_BME280
+    "<div>"
+    "Current temperature is";
+  page += String(bme280_current_temperature());
+  page += "</div>"
+#endif
     "<div class='row'>"
-    "Want to hack this? <a href='https://github.com/romkey/vendo'>https://github.com/romkey/vendo</a>"
+    "Want to hack this?&nbsp; <a href='https://github.com/romkey/vendo'>https://github.com/romkey/vendo</a>"
     "</div>"
     "</div>"
     "<script src='https://code.jquery.com/jquery-3.2.1.slim.min.js' integrity='sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN' crossorigin='anonymous'></script>"

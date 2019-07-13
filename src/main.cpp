@@ -105,6 +105,7 @@ void setup() {
 
 #ifdef HAS_BME280
   bme280_setup();
+  Serial.println("[bme280]");
 #endif
 
 #ifdef DISCOBALL_DISCO_1
@@ -120,6 +121,10 @@ void setup() {
   preset_set("rainbow");
   animation_set("march");
   animation_speed(3);
+#endif
+
+#ifdef DISCOBALL_CTRLH_3
+  preset_set("off");
 #endif
 }
 

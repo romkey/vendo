@@ -57,4 +57,8 @@ void bme280_handle() {
 
   next_read = millis() + BME280_UPDATE_DELAY;
 }
+
+float bme280_current_temperature() {
+  return bme280.readTemperature();
+}
 #endif

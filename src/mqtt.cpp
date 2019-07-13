@@ -15,6 +15,9 @@ bool mqtt_connect() {
 
   mqtt_client.connect(MQTT_UUID, MQTT_USER, MQTT_PASS);
   mqtt_client.subscribe(MQTT_CMD_TOPIC);
+
+  mqtt_client.publish("/status", "\"hello world\"");
+
   return true;
 }
 
@@ -53,6 +56,7 @@ void mqtt_setup() {
 
   snprintf(topic_name, TOPIC_NAME_LENGTH, "/homebus/device/%s/animations", MQTT_UUID);
   mqtt_client.publish(topic_name, buf, true);
+  mqtt_client.publish("/status", buf, true);
 
   snprintf(buf, buffer_length, "{ \"presets\": [ ");
   for(int i = 0; i < presets_length; i++) {
@@ -63,13 +67,14 @@ void mqtt_setup() {
       current_buf_len += 2;
     }
 
-    snprintf(buf + current_buf_len, buffer_length - current_buf_len, "\"%s\", ", presets[i].name);
+    snprintf(buf + current_buf_len, buffer_length - current_buf_len, "\"%s\"", presets[i].name);
   }
 
   strncat(buf, "]}", buffer_length - strlen(buf));
   
   snprintf(topic_name, TOPIC_NAME_LENGTH, "/homebus/device/%s/presets", MQTT_UUID);
   mqtt_client.publish(topic_name, buf, true);
+  mqtt_client.publish("/status", buf, true);
 }
 
 void mqtt_handle() {
@@ -116,18 +121,8 @@ void mqtt_callback(const char* topic, const byte* payload, unsigned int length) 
     return;
   }
 
-  if(strcmp(command, "on") == 0) {
-    leds_on();
-    return;
-  }
-
   if(strcmp(command, "stop") == 0) {
     animation_stop();
-    return;
-  }
-
-  if(strcmp(command, "start") == 0) {
-    animation_start();
     return;
   }
 
