@@ -242,6 +242,10 @@ void animation_speed(float desired_speed) {
   speed = desired_speed;
 }
 
+float animation_speed(void) {
+  return speed;
+}
+
 unsigned animate() {
   if(running)
     return (unsigned)((*current_animation->animation)(false) / speed);

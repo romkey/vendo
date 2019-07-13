@@ -35,65 +35,40 @@ void mqtt_setup() {
     presets_buf_size += strlen(presets[i].name) + sizeof(" \"\", ");
 
   uint16_t buffer_length = max(animations_buf_size, presets_buf_size);
-  Serial.printf("buffer length %u\n", buffer_length);
-  delay(200);
-
   char buf[buffer_length];
 
   snprintf(buf, buffer_length, "{ \"animations\": [ ");
   for(int i = 0; i < animations_length; i++) {
     uint16_t current_buf_len = strlen(buf);
 
-    if(i > 0)
+    if(i > 0) {
       strncat(buf, ", ", current_buf_len);
-
-    current_buf_len += 2;
+      current_buf_len += 2;
+    }
 
     snprintf(buf + current_buf_len, buffer_length - current_buf_len, "\"%s\"", animations[i].name);
-    Serial.println(i);
-    Serial.println(animations[i].name);
-    Serial.println(buf);
-    delay(200);
   }
 
-  Serial.println(buffer_length - strlen(buf));
-  delay(200);
-
   strncat(buf, "]}", buffer_length - strlen(buf));
-  Serial.println(buf);
-  delay(200);
-
 
   snprintf(topic_name, TOPIC_NAME_LENGTH, "/homebus/device/%s/animations", MQTT_UUID);
-  Serial.println(topic_name);
-  delay(200);
-
   mqtt_client.publish(topic_name, buf, true);
 
-  Serial.println(buf);
-  delay(200);
-
-		  
   snprintf(buf, buffer_length, "{ \"presets\": [ ");
   for(int i = 0; i < presets_length; i++) {
     uint16_t current_buf_len = strlen(buf);
 
-    if(i > 0)
+    if(i > 0) {
       strncat(buf, ", ", current_buf_len);
-
-    current_buf_len += 2;
+      current_buf_len += 2;
+    }
 
     snprintf(buf + current_buf_len, buffer_length - current_buf_len, "\"%s\", ", presets[i].name);
-    Serial.println(i);
-    Serial.println(buf);
-    delay(200);
   }
 
   strncat(buf, "]}", buffer_length - strlen(buf));
   
   snprintf(topic_name, TOPIC_NAME_LENGTH, "/homebus/device/%s/presets", MQTT_UUID);
-  Serial.println(topic_name);
-  delay(200);
   mqtt_client.publish(topic_name, buf, true);
 }
 

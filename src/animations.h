@@ -14,6 +14,7 @@ animation_t* animation_lookup(const char*);
 void animation_set(animation_t*);
 bool animation_set(const char*);
 void animation_speed(float);
+float animation_speed(void);
 void animation_start();
 void animation_stop();
 unsigned animate();
