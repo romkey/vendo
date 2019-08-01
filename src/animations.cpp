@@ -42,185 +42,20 @@
  */
 
 
-#if 0
-/**** not working, so removed for now
- **** definitions for MasterTwinkle by https://gist.github.com/kriegsman/88954aae22b03a664081
- ****/
-#define PEAK_COLOR       CRGB(64,0,64)
-
-#define DELTA_COLOR_UP   CRGB(4,0,4)
-
-// Amount to decrement the color by each loop as it gets dimmer:
-#define DELTA_COLOR_DOWN CRGB(1,0,1)
-
-// Chance of each pixel starting to brighten up.  
-// 1 or 2 = a few brightening pixels at a time.
-// 10 = lots of pixels brightening at a time.
-#define CHANCE_OF_TWINKLE 1
-
-enum { SteadyDim, GettingBrighter, GettingDimmerAgain };
-
-static unsigned twinkle(bool init) {
-  static uint8_t PixelState[NUM_LEDS];
-  static CRGB original_leds[NUM_LEDS];
-
-  if(init) {
-    for(int i = 0; i < NUM_LEDS; i++) {
-      PixelState[i] = SteadyDim;
-      original_leds[i] = leds[i];
-    }
-
-    //    fill_solid( leds, NUM_LEDS, BASE_COLOR);
-
-    return 0;
-  }
-
-  for( uint16_t i = 0; i < NUM_LEDS; i++) {
-    if( PixelState[i] == SteadyDim) {
-      // this pixels is currently: SteadyDim
-      // so we randomly consider making it start getting brighter
-      if( random8() < CHANCE_OF_TWINKLE) {
-        PixelState[i] = GettingBrighter;
-      }
-      
-    } else if( PixelState[i] == GettingBrighter ) {
-      // this pixels is currently: GettingBrighter
-      // so if it's at peak color, switch it to getting dimmer again
-      if( leds[i] >= PEAK_COLOR ) {
-        PixelState[i] = GettingDimmerAgain;
-      } else {
-        // otherwise, just keep brightening it:
-        leds[i] += DELTA_COLOR_UP;
-      }
-      
-    } else { // getting dimmer again
-      // this pixels is currently: GettingDimmerAgain
-      // so if it's back to base color, switch it to steady dim
-      if( leds[i] <= original_leds[i] ) {
-        leds[i] = original_leds[i]; // reset to exact base color, in case we overshot
-        PixelState[i] = SteadyDim;
-      } else {
-        // otherwise, just keep dimming it down:
-        leds[i] -= DELTA_COLOR_DOWN;
-      }
-    }
-  }
-
-  FastLED.show();
-  return 10;
-}
-#endif
-
-
-static unsigned march(bool init) {
-  CRGB last = leds[0];
-
-  if(init)
-    return 0;
-
-  for(int i = 0; i < NUM_LEDS - 1 ; i++)
-    leds[i] = leds[i+1];
-
-  leds[NUM_LEDS-1] = last;
-  FastLED.show();
-
-  return 1000;
-}
-
-static unsigned throb(bool init) {
-  static uint8_t brightness = 255;
-  static int8_t direction = -1;
-  static CRGB old_leds[NUM_LEDS];
-
-  if(init) {
-    for(int i = 0; i < NUM_LEDS; i++)
-      old_leds[i] = leds[i];
-
-    return 0;
-  }
-
-  for(int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = old_leds[i];
-    leds[i].nscale8_video(brightness);
-  }
-
-  FastLED.show();
-
-  if(brightness == 255)
-    direction = -1;
-
-  if(brightness == 0)
-    direction = 1;
-
-  brightness += direction;
-
-  return 10;
-}
-
-static unsigned invert(bool init) {
-  for(int i = 0; i < NUM_LEDS; i++)
-    leds[i] = -leds[i];
-
-  FastLED.show();
-
-  return 1000;
-}
-
-static unsigned blink(bool init) {
-  static CRGB old_leds[NUM_LEDS];
-  static bool onoff = false;
-
-  if(onoff) {
-    for(int i = 0; i < NUM_LEDS; i++)
-      leds[i] = old_leds[i];
-
-    onoff = false;
-  } else {
-    for(int i = 0; i < NUM_LEDS; i++) {
-      old_leds[i] = leds[i];
-      leds[i] = 0;
-    }
-
-    onoff = true;
-  }
-
-  FastLED.show();
-
-  return 1000;
-}
-
-static unsigned alternating_blink(bool init) {
-  static CRGB old_leds[NUM_LEDS];
-  static uint8_t offset = 0;
-
-  if(init) {
-    for(int i = 0; i < NUM_LEDS; i++)
-      old_leds[i] = leds[i];
-
-    return 0;
-  }
-
-  for(int i = 0; i < NUM_LEDS; i++) {
-    if(i + offset % 2)
-      leds[i] = old_leds[i];
-    else
-      leds[i] = 0;
-  }
-
-  FastLED.show();
-
-  offset +=1;
-  offset %= 2;
-
-  return 1000;
-}
+unsigned animation_alternating_blink(bool),
+  animation_blink(bool),
+  animation_fire(bool),
+  animation_invert(bool),
+  animation_march(bool),
+  animation_throb(bool);
 
 animation_t animations[] = {
-  "alternating blink", alternating_blink,
-  "blink", blink,
-  "invert", invert,
-  "march", march,
-  "throb", throb
+  "alternating blink", animation_alternating_blink,
+  "blink", animation_blink,
+  "fire", animation_fire,
+  "invert", animation_invert,
+  "march", animation_march,
+  "throb", animation_throb
 };
 
 unsigned animations_length = sizeof(animations)/sizeof(animation_t);
