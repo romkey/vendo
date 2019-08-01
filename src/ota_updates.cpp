@@ -1,8 +1,11 @@
-#include "ota_updates.h"
+#include "config.h"
 
-extern char hostname[];
+#include "ota_updates.h"
+#include "wifi_local.h"
 
 void ota_updates_setup() {
+  const char* hostname = wifi_hostname();
+
   ArduinoOTA.setHostname(hostname);
   ArduinoOTA.onStart([]() {
       String type;

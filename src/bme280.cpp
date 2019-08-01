@@ -5,6 +5,11 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
+// needed by BME280 library, not automatically included during PlatformIO build process :(
+#include <Wire.h>
+#include <SPI.h>
+
+#include "wifi_local.h"
 #include "mqtt.h"
 #include "bme280.h"
 #include "uptime.h"
@@ -32,9 +37,11 @@ void bme280_setup() {
 
 static unsigned long next_read = 0;
 
-extern char *build_info, *hostname;
+extern char *build_info;
 
 void bme280_handle() {
+  const char* hostname = wifi_hostname();
+
   if(millis() < next_read)
     return;
 
@@ -45,7 +52,7 @@ void bme280_handle() {
   snprintf(buf, BUFFER_SIZE, "{ \"id\": \"%s\", \"system\": {\"name\": \"%s\", \"build\": \"%s\", \"freeheap\": %d, \"uptime\": %lu, \"ip\": \"%d.%d.%d.%d\", \"rssi\": %d }, \"environment\": { \"temperature\": %.1f, \"humidity\": %.1f, \"pressure\": %.1f } }",
 	   MQTT_UUID,
 	   //	   hostname, build_info, ESP.getFreeHeap(), uptime.uptime()/1000, local[0], local[1], local[2], local[3], WiFi.RSSI(),
-	   "", "", ESP.getFreeHeap(), uptime.uptime()/1000, local[0], local[1], local[2], local[3], WiFi.RSSI(),
+	   hostname, "", ESP.getFreeHeap(), uptime.uptime()/1000, local[0], local[1], local[2], local[3], WiFi.RSSI(),
 	   bme280.readTemperature(), bme280.readHumidity(), bme280.readPressure());	   
 
 #ifdef VERBOSE

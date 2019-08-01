@@ -1,6 +1,7 @@
 #pragma once
 
 // Wifi configuration
+// add credentials for up to three wifi networks, leave unused ones as the empty string
 #define WIFI_SSID1     ""
 #define WIFI_PASSWORD1 ""
 
@@ -10,54 +11,18 @@
 #define WIFI_SSID3     ""
 #define WIFI_PASSWORD3 ""
 
-// balcony LEDs
-#define DISCOBALL_DISCO_1
-// dev LEDs
-// #define DISCOBALL_DISCO_2
-// vending machine
-// #define DISCOBALL_CTRLH_1
-// 100 LED strand
-// #define DISCOBALL_CTRLH_2
+// define USE_MQTT if you want to include the MQTT command interface
+// must define USE_MQTT if you define USE_BME280
+#define USE_MQTT 1
 
-// MQTT configuration is provided by HomeBus provisioning server or manually
-#ifdef DISCOBALL_DISCO_1
 #define MQTT_HOST ""
 #define MQTT_PORT 1883
 #define MQTT_USER ""
 #define MQTT_PASS ""
 #define MQTT_UUID ""
-#endif
 
-#ifdef DISCOBALL_DISCO_2
-#define MQTT_HOST ""
-#define MQTT_PORT 1883
-#define MQTT_USER ""
-#define MQTT_PASS ""
-#define MQTT_UUID ""
-#endif
-
-#ifdef DISCOBALL_CTRLH_1
-#define MQTT_HOST ""
-#define MQTT_PORT 1883
-
-#define MQTT_USER ""
-#define MQTT_PASS ""
-#define MQTT_UUID ""
-
-#define HAS_BME280
-#define BME280_UPDATE_DELAY 60*1000
-#define BME280_MQTT_PUBLISH_TOPIC "/vendo"
-#endif
-
-#ifdef DISCOBALL_CTRLH_2
-#define MQTT_HOST ""
-#define MQTT_PORT 1883
-
-#define MQTT_USER ""
-#define MQTT_PASS ""
-#define MQTT_UUID ""
-#endif
-
+// the command topic for MQTT
+// should be replaced with /homebus/MQTT_UUID/cmd
 #define MQTT_CMD_TOPIC "/leds/cmd"
 
 #define WIFI_PROVISION_UUID ""

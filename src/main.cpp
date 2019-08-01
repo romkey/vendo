@@ -1,17 +1,12 @@
 #include <Arduino.h>
 
 #include <Esp.h>
-#include <ESPmDNS.h>
 #include <WiFi.h>
-#include <WiFiMulti.h>
-
-#include <ArduinoOTA.h>
-
-// needed by BME280 library, not automatically included during PlatformIO build process :(
-#include <Wire.h>
-#include <SPI.h>
+#include <ESPmDNS.h>
 
 #include "config.h"
+
+#include "wifi_local.h"
 #include "leds.h"
 #include "presets.h"
 #include "animations.h"
@@ -24,8 +19,6 @@
 #endif
 
 #include "hw.h"
-
-char hostname[sizeof("discoball-%02x%02x%02x") + 1];
 
 #ifdef BUILD_INFO
 
@@ -41,12 +34,9 @@ char build_info[] = "not set";
 // used to store persistent data across crashes/reboots
 // cleared when power cycled or re-flashed
 static RTC_DATA_ATTR int bootCount = 0;
-static RTC_DATA_ATTR int wifi_failures = 0;
-
-WiFiMulti wifiMulti;
 
 void setup() {
-  byte mac_address[6];
+  const char* hostname = "";
 
   bootCount++;
 
@@ -56,40 +46,20 @@ void setup() {
   Serial.println("Hello World!");
   Serial.printf("Build %s\n", build_info);
 
-  WiFi.macAddress(mac_address);
-  snprintf(hostname, sizeof(hostname), "discoball-%02x%02x%02x", (int)mac_address[3], (int)mac_address[4], (int)mac_address[5]);
-  Serial.printf("Hostname: %s\n", hostname);
-  Serial.printf("MAC address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-		mac_address[0],
-		mac_address[1],
-		mac_address[2],
-		mac_address[3],
-		mac_address[4],
-		mac_address[5]);
-  WiFi.setHostname(hostname);
+  if(wifi_begin()) {
+    Serial.println(WiFi.localIP());
+    Serial.println("[wifi]");
 
-  wifiMulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
-  wifiMulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
-  wifiMulti.addAP(WIFI_SSID3, WIFI_PASSWORD3);
+    hostname = wifi_hostname();
 
-  static int wifi_tries = 0;
-  while(wifiMulti.run() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(100);
+    if(!MDNS.begin(hostname))
+      Serial.println("Error setting up MDNS responder!");
+    else
+      Serial.println("[mDNS]");
 
-    if(wifi_tries++ > 100) {
-      wifi_failures++;
-      ESP.restart();
-    }
+  } else {
+    Serial.println("wifi failure");
   }
-
-  Serial.println(WiFi.localIP());
-  Serial.println("[wifi]");
-
-  if(!MDNS.begin(hostname))
-    Serial.println("Error setting up MDNS responder!");
-  else
-    Serial.println("[mDNS]");
 
   ota_updates_setup();
   Serial.println("[ota_updates]");
@@ -97,8 +67,10 @@ void setup() {
   http_server_setup();
   Serial.println("[http_server]");
 
+#ifdef USE_MQTT
   mqtt_setup();
   Serial.println("[mqtt]");
+#endif
 
   leds_setup();
   Serial.println("[leds]");
@@ -134,8 +106,10 @@ void loop() {
 
   http_server_handle();
 
+#ifdef USE_MQTT
   mqtt_handle();
-  
+#endif
+
   leds_handle();
 
 #ifdef HAS_BME280

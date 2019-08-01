@@ -1,6 +1,10 @@
 #include <WiFi.h>
 
 #include "config.h"
+
+#ifdef USE_MQTT
+
+#include "wifi_local.h"
 #include "presets.h"
 #include "animations.h"
 #include "leds.h"
@@ -180,3 +184,5 @@ void mqtt_callback(const char* topic, const byte* payload, unsigned int length) 
     return;
   }
 }
+
+#endif
