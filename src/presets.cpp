@@ -116,6 +116,8 @@ static void reverse_watermelon() {
 static void random() {
   for(int i=0; i<NUM_LEDS; i++)
     leds[i] = CRGB(random8(), random8(), random8());
+
+  FastLED.show();
 }
 
 static void off() {
