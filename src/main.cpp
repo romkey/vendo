@@ -1,8 +1,13 @@
 #include <Arduino.h>
 
+#ifdef ESP8266
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#else
 #include <Esp.h>
 #include <WiFi.h>
 #include <ESPmDNS.h>
+#endif
 
 #include "config.h"
 
@@ -33,7 +38,11 @@ char build_info[] = "not set";
 
 // used to store persistent data across crashes/reboots
 // cleared when power cycled or re-flashed
+#ifdef ESP8266
+static int bootCount = 0;
+#else
 static RTC_DATA_ATTR int bootCount = 0;
+#endif
 
 void setup() {
   const char* hostname = "";

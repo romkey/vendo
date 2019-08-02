@@ -2,14 +2,28 @@
 
 #include "wifi_local.h"
 
+#ifdef ESP8266
+#include <ESP8266WiFi.h>
+#include <ESP8266WiFiMulti.h>
+#else
 #include <WiFi.h>
 #include <WiFiMulti.h>
+#endif
+
 
 static char hostname[sizeof("discoball-%02x%02x%02x") + 1];
 
+#ifdef ESP8266
+static ESP8266WiFiMulti wifiMulti;
+#else
 static WiFiMulti wifiMulti;
+#endif
 
+#ifdef ESP8266
+static int wifi_failures = 0;
+#else
 static RTC_DATA_ATTR int wifi_failures = 0;
+#endif
 
 bool wifi_begin() {
   byte mac_address[6];
@@ -24,7 +38,11 @@ bool wifi_begin() {
 		mac_address[3],
 		mac_address[4],
 		mac_address[5]);
+#ifdef ESP8266
+  WiFi.hostname(hostname);
+#else
   WiFi.setHostname(hostname);
+#endif
 
   wifiMulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
   wifiMulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
