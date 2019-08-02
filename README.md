@@ -55,8 +55,13 @@ Setting a preset stops the current animation.
 
 ### Animations
 
-Animations are subroutines statically scoped to this file which take one argument,
-indicating whether they should initialize themselves.
+Animations are subroutines which take one argument, indicating whether they should
+initialize themselves. In order to keep `src/animations.cpp` from becoming unreadable, each
+animation routine is in its own file in the `src/animations/` directory. Each animation
+routine should keep its own variables static in order to avoid polluting the global
+namespace and accidentally colliding with names used by other routines. Only the
+routine name, which should start with animation_,  should be global. Add the routine
+name to the animations[] array below to make it available to the user interface.
 
 Init will be called when the animation is first selected. On init the animation
 routine should set up any state it needs in order to perform the animation (like
@@ -72,7 +77,8 @@ do this for them.
 Animations should avoid calling `delay()` when possible and instead should maintain state using
 state variables and return the number of milliseconds till they need to resume. This
 allows the code to also perform operations involving the network stack: service
-commands via the web interface and MQTT and perform over-the-air-updates.
+commands via the web interface and MQTT and perform over-the-air-updates. Also do not use
+FastLED's `EVERY_N_MILLISECONDS()` or `EVERY_N_SECONDS()` macros.
 
 Network activity will almost certainly disrupt the timing of an animation, but we
 expect network activity to normally only happen when the user initiates a command, which
