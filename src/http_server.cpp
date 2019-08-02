@@ -157,9 +157,9 @@ static void handle_root() {
     "</form>"
 #ifdef HAS_BME280
     "<div>"
-    "Current temperature is";
+    "Current temperature is ";
   page += String(bme280_current_temperature());
-  page += "</div>"
+  page += "°C</div>"
 #endif
     "<div class='row'>"
     "Want to hack this?&nbsp; <a href='https://github.com/romkey/vendo'>https://github.com/romkey/vendo</a>"
