@@ -2,6 +2,10 @@
 #include "leds.h"
 #include "animations.h"
 
+// adapted from FastLED's examples
+// https://github.com/FastLED/FastLED/blob/master/examples/Fire2012WithPalette/Fire2012WithPalette.ino
+// rewritten to avoid using delay() calls
+
 #define COOLING  55
 #define SPARKING 120
 

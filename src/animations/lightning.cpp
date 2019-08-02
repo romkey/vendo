@@ -2,6 +2,14 @@
 #include "leds.h"
 #include "animations.h"
 
+// originally written by Daniel Wilson
+// then adapted by Andrew Tuline
+// then adapted for vendo, eliminating delay() calls
+// https://github.com/atuline/FastLED-Demos/blob/master/lightnings/lightnings.ino
+
+// THIS FILE IS LICENSED UNDER GNU PUBLIC LICENSE v3.0
+// https://github.com/atuline/FastLED-Demos/blob/master/LICENSE
+
 #define FREQUENCY 50                                       // controls the interval between strikes
 #define FLASHES   8                                          //the upper limit of flashes per strike
 static unsigned int dimmer = 1;
