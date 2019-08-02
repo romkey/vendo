@@ -7,6 +7,7 @@ void ota_updates_setup() {
   const char* hostname = wifi_hostname();
 
   ArduinoOTA.setHostname(hostname);
+#ifndef ESP8266
   ArduinoOTA.onStart([]() {
       String type;
       if (ArduinoOTA.getCommand() == U_FLASH)
@@ -32,6 +33,7 @@ void ota_updates_setup() {
       else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
       else if (error == OTA_END_ERROR) Serial.println("End Failed");
     });
+#endif
 
   ArduinoOTA.begin();
 }
