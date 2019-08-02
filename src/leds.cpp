@@ -10,7 +10,8 @@ void leds_setup() {
 #else
   FastLED.addLeds<LED_TYPE, LED_DATA_PIN, LED_RGB>(leds, NUM_LEDS);
 #endif
-  FastLED.setBrightness(255);
+
+  leds_brightness(100);
 }
 
 void leds_handle() {
@@ -27,11 +28,20 @@ void leds_on() {
 void leds_off() {
 }
 
+static uint8_t stored_brightness = 100;
+
+uint8_t leds_brightness(void) {
+  return stored_brightness;
+}
+
 void leds_brightness(uint8_t brightness) {
   if(brightness > 100)
     brightness = 100;
 
-  FastLED.setBrightness(map(brightness, 0, 100, 0, 256));
+  stored_brightness = brightness;
+
+  FastLED.setBrightness(map(brightness, 0, 100, 0, 255));
+  FastLED.show();
 }
 
 void leds_fill(uint8_t red, uint8_t green, uint8_t blue) {
