@@ -46,6 +46,7 @@ unsigned animation_alternating_blink(bool),
   animation_blink(bool),
   animation_fire(bool),
   animation_invert(bool),
+  animation_lightning(bool),
   animation_march(bool),
   animation_throb(bool);
 
@@ -54,6 +55,7 @@ animation_t animations[] = {
   "blink", animation_blink,
   "fire", animation_fire,
   "invert", animation_invert,
+  "lightning", animation_lightning,
   "march", animation_march,
   "throb", animation_throb
 };
