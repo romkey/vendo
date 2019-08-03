@@ -1,6 +1,7 @@
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
 #else
+#include <Esp.h>
 #include <WiFi.h>
 #endif
 
@@ -13,6 +14,10 @@
 #include "animations.h"
 #include "leds.h"
 #include "mqtt.h"
+
+#ifdef HAS_BME280
+#include "bme280.h"
+#endif
 
 static WiFiClient wifi_mqtt_client;
 static PubSubClient mqtt_client(wifi_mqtt_client);
@@ -33,56 +38,6 @@ void mqtt_setup() {
   mqtt_client.setServer(MQTT_HOST, MQTT_PORT);
   mqtt_client.setCallback(mqtt_callback);
   mqtt_connect();
-
-#define TOPIC_NAME_LENGTH sizeof("/homebus/device/") + strlen(MQTT_UUID) + sizeof("/animations") + 1
-  char topic_name[TOPIC_NAME_LENGTH];
-
-  uint16_t animations_buf_size = sizeof("{ \"animations\": [ ] }") + 1;
-  for(int i = 0; i < animations_length; i++)
-    animations_buf_size += strlen(animations[i].name) + sizeof(", ");
-
-  uint16_t presets_buf_size = sizeof("{ \"presets\": [ ] }") + 1;
-  for(int i = 0; i < presets_length; i++)
-    presets_buf_size += strlen(presets[i].name) + sizeof(" \"\", ");
-
-  uint16_t buffer_length = max(animations_buf_size, presets_buf_size);
-  char buf[buffer_length];
-
-  snprintf(buf, buffer_length, "{ \"animations\": [ ");
-  for(int i = 0; i < animations_length; i++) {
-    uint16_t current_buf_len = strlen(buf);
-
-    if(i > 0) {
-      strncat(buf, ", ", current_buf_len);
-      current_buf_len += 2;
-    }
-
-    snprintf(buf + current_buf_len, buffer_length - current_buf_len, "\"%s\"", animations[i].name);
-  }
-
-  strncat(buf, "]}", buffer_length - strlen(buf));
-
-  snprintf(topic_name, TOPIC_NAME_LENGTH, "/homebus/device/%s/animations", MQTT_UUID);
-  mqtt_client.publish(topic_name, buf, true);
-  mqtt_client.publish("/status", buf, true);
-
-  snprintf(buf, buffer_length, "{ \"presets\": [ ");
-  for(int i = 0; i < presets_length; i++) {
-    uint16_t current_buf_len = strlen(buf);
-
-    if(i > 0) {
-      strncat(buf, ", ", current_buf_len);
-      current_buf_len += 2;
-    }
-
-    snprintf(buf + current_buf_len, buffer_length - current_buf_len, "\"%s\"", presets[i].name);
-  }
-
-  strncat(buf, "]}", buffer_length - strlen(buf));
-  
-  snprintf(topic_name, TOPIC_NAME_LENGTH, "/homebus/device/%s/presets", MQTT_UUID);
-  mqtt_client.publish(topic_name, buf, true);
-  mqtt_client.publish("/status", buf, true);
 }
 
 void mqtt_handle() {
@@ -98,8 +53,8 @@ void mqtt_handle() {
   }
 }
 
-void mqtt_publish(const char* topic, const char* payload) {
-  mqtt_client.publish(topic, payload, true);
+void mqtt_publish(const char* topic, const char* payload, bool retain) {
+  mqtt_client.publish(topic, payload, retain);
 }
 
 void mqtt_callback(const char* topic, const byte* payload, unsigned int length) {

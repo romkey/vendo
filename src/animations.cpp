@@ -2,6 +2,9 @@
 #include "leds.h"
 #include "animations.h"
 
+extern bool status_changed;
+
+
 /*
  * ANIMATIONS
  *
@@ -74,6 +77,10 @@ static float speed = 1;
 static bool running = true;
 
 void animation_start() {
+  leds_on();
+
+  status_changed = true;
+
   (*current_animation->animation)(true);
   running = true;
 }
@@ -83,6 +90,8 @@ void animation_stop() {
 }
 
 void animation_speed(float desired_speed) {
+  status_changed = true;
+
   speed = desired_speed;
 }
 
@@ -106,6 +115,10 @@ animation_t* animation_lookup(const char* name) {
 }
 
 void animation_set(animation_t* animation) {
+  status_changed = true;
+
+  leds_on();
+
   current_animation = animation;
   animation_start();
 }

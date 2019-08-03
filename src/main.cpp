@@ -18,6 +18,7 @@
 #include "ota_updates.h"
 #include "http_server.h"
 #include "mqtt.h"
+#include "homebus_mqtt.h"
 
 #ifdef HAS_BME280
 #include "bme280.h"
@@ -39,9 +40,9 @@ char build_info[] = "not set";
 // used to store persistent data across crashes/reboots
 // cleared when power cycled or re-flashed
 #ifdef ESP8266
-static int bootCount = 0;
+int bootCount = 0;
 #else
-static RTC_DATA_ATTR int bootCount = 0;
+RTC_DATA_ATTR int bootCount = 0;
 #endif
 
 void setup() {
@@ -79,6 +80,9 @@ void setup() {
 #ifdef USE_MQTT
   mqtt_setup();
   Serial.println("[mqtt]");
+
+  homebus_mqtt_setup();
+  Serial.println("[homebus-mqtt]");
 #endif
 
   leds_setup();
@@ -107,8 +111,10 @@ void setup() {
 #ifdef DISCOBALL_CTRLH_3
   preset_set("off");
 #endif
+
 }
 
+bool status_changed = true;
 
 void loop() {
   ota_updates_handle();
@@ -117,6 +123,7 @@ void loop() {
 
 #ifdef USE_MQTT
   mqtt_handle();
+  homebus_mqtt_handle();
 #endif
 
   leds_handle();

@@ -3,6 +3,9 @@
 #include "animations.h"
 #include "presets.h"
 
+extern bool status_changed;
+
+
 /*
  * PRESETS
  *
@@ -169,7 +172,10 @@ bool preset_set(const char* name) {
   preset_t *preset = preset_lookup(name);
 
   if(preset) {
+    status_changed = true;
+
     animation_stop();
+    leds_on();
     preset_set(preset);
     return true;
   }
@@ -178,5 +184,9 @@ bool preset_set(const char* name) {
 }
 
 void preset_rgb(uint8_t red, uint8_t green, uint8_t blue) {
+  status_changed = true;
+
+  animation_stop();
+  leds_on();
   leds_fill(CRGB(red, green, blue));
 }

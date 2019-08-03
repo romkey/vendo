@@ -2,6 +2,8 @@
 #include "leds.h"
 #include "animations.h"
 
+extern bool status_changed;
+
 CRGB leds[NUM_LEDS];
 
 void leds_setup() {
@@ -22,10 +24,26 @@ void leds_handle() {
   }
 }
 
+static bool leds_state = false;
+
+bool leds_status() {
+  return leds_state;
+}
+
 void leds_on() {
+  status_changed = true;
+
+  leds_state = true;
 }
 
 void leds_off() {
+  status_changed = true;
+
+  leds_state = false;
+
+  animation_stop();
+  leds_fill(CRGB(0,0,0));
+  FastLED.show();
 }
 
 static uint8_t stored_brightness = 100;
@@ -35,6 +53,11 @@ uint8_t leds_brightness(void) {
 }
 
 void leds_brightness(uint8_t brightness) {
+  if(brightness == stored_brightness)
+    return;
+
+  status_changed = true;
+
   if(brightness > 100)
     brightness = 100;
 

@@ -20,9 +20,9 @@ static WiFiMulti wifiMulti;
 #endif
 
 #ifdef ESP8266
-static int wifi_failures = 0;
+int wifi_failures = 0;
 #else
-static RTC_DATA_ATTR int wifi_failures = 0;
+RTC_DATA_ATTR int wifi_failures = 0;
 #endif
 
 bool wifi_begin() {
