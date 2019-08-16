@@ -21,6 +21,12 @@
 #define MQTT_PASS ""
 #define MQTT_UUID ""
 
+#define NUM_LEDS 50
+#define LED_DATA_PIN 33
+#define LED_CLOCK_PIN 32
+#define LED_TYPE WS2812B
+#define LED_RGB RGB
+
 // the command topic for MQTT
 // should be replaced with /homebus/MQTT_UUID/cmd
 #define MQTT_CMD_TOPIC "/leds/cmd"

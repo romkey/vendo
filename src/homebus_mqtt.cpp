@@ -7,6 +7,8 @@
 
 #include "config.h"
 
+#ifdef USE_MQTT
+
 #include "uptime.h"
 
 #include "wifi_local.h"
@@ -148,3 +150,5 @@ static void homebus_mqtt_start_announcement() {
   mqtt_publish(topic_name, buf, true);
   mqtt_publish("/status", buf, true);
 }
+
+#endif // USE_MQTT
