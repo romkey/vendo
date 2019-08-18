@@ -6,7 +6,7 @@
 #include "presets.h"
 #include "animations.h"
 
-#include "bme280.h"
+#include "multiball/bme280.h"
 
 #ifdef ESP8266
 #include <ESP8266WiFi.h>

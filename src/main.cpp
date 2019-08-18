@@ -1,27 +1,19 @@
 #include <Arduino.h>
 
-#ifdef ESP8266
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
-#else
-#include <Esp.h>
-#include <WiFi.h>
-#include <ESPmDNS.h>
-#endif
-
 #include "config.h"
 
-#include "wifi_local.h"
+#include <multiball/wifi.h>
+#include <multiball/ota_updates.h>
+#include <multiball/mqtt.h>
+
 #include "leds.h"
 #include "presets.h"
 #include "animations.h"
-#include "ota_updates.h"
 #include "http_server.h"
-#include "mqtt.h"
 #include "homebus_mqtt.h"
 
 #ifdef HAS_BME280
-#include "bme280.h"
+#include <multiball/bme280.h>
 #endif
 
 #include "hw.h"
@@ -44,6 +36,12 @@ int bootCount = 0;
 #else
 RTC_DATA_ATTR int bootCount = 0;
 #endif
+
+static char *wifis[6] = {
+  WIFI_SSID1, WIFI_PASSWORD1,
+  WIFI_SSID2, WIFI_PASSWORD2,
+  WIFI_SSID3, WIFI_PASSWORD3
+};
 
 void setup() {
   const char* hostname = "";

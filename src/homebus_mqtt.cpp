@@ -9,13 +9,15 @@
 
 #ifdef USE_MQTT
 
-#include "uptime.h"
 
-#include "wifi_local.h"
+#include "multiball/wifi.h"
+#include "multiball/mqtt.h"
+
+#include "multiball/uptime.h"
+
 #include "presets.h"
 #include "animations.h"
 #include "leds.h"
-#include "mqtt.h"
 #include "homebus_mqtt.h"
 
 #ifdef HAS_BME280
