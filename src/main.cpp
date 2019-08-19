@@ -37,7 +37,7 @@ int bootCount = 0;
 RTC_DATA_ATTR int bootCount = 0;
 #endif
 
-static char *wifis[6] = {
+static const char *wifi_credentials[] = {
   WIFI_SSID1, WIFI_PASSWORD1,
   WIFI_SSID2, WIFI_PASSWORD2,
   WIFI_SSID3, WIFI_PASSWORD3
@@ -54,7 +54,7 @@ void setup() {
   Serial.println("Hello World!");
   Serial.printf("Build %s\n", build_info);
 
-  if(wifi_begin()) {
+  if(wifi_begin(wifi_credentials, 3)) {
     Serial.println(WiFi.localIP());
     Serial.println("[wifi]");
 
@@ -115,6 +115,8 @@ void setup() {
 bool status_changed = true;
 
 void loop() {
+  wifi_handle();
+
   ota_updates_handle();
 
   http_server_handle();
