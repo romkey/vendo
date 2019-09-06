@@ -111,12 +111,13 @@ static void handle_root() {
   }
 
   page += "</select>"
-    "<br/><input type='submit' class='form-control btn btn-primary'>"
+    "<br/>"
     "</form>"
     "<form action='/'>"
     "<label for='animation'>Animations</label>"
     "<select id='animation' name='animation' class='form-control'>";
 
+  bool any_animation_ignores_presets = false;
   for(int i = 0; i < animations_length; i++) {
     page += "  <option value='";
     page += animations[i].name;
@@ -126,11 +127,18 @@ static void handle_root() {
       page += "'>";
 
     page += animations[i].name;
+    if(animations[i].ignores_presets) {
+      any_animation_ignores_presets = true;
+      page += " *";
+    }
     page += "</option>";
   }
 
-  page += "</select>"
-    "<br/><input type='submit' class='form-control btn btn-primary'>"
+  page += "</select>";
+  if(any_animation_ignores_presets)
+    page += "<br/>* animation ignores color presets";
+
+  page += "<br/>"
     "</form>"
     "<a href='/stop' class='btn btn-info'>Stop Animation</a>"
     "<div><form action='/'>"
@@ -174,6 +182,9 @@ static void handle_root() {
     "        console.log(color.hexString);"
     "    }"
     "    colorPicker.on('color:change', onColorChange);"
+    "    $('select').change(function() {"
+    "        this.form.submit();"
+    "    });"
     "});"
     "</script>"
     "</body>"

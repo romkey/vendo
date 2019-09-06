@@ -3,6 +3,7 @@
 typedef struct animation {
   const char* name;
   unsigned (*animation)(bool init);
+  bool ignores_presets;
 } animation_t;
 
 extern animation_t animations[];

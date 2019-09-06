@@ -1,6 +1,12 @@
-# ^H Vending Machine LED Lighting Controller
+# Discoball RGB LED Controller Hardware and Software
 
-This repo has the hardware plans and code for the lighting inside the vending machine at [Control H](https://pdxhackerspace.org).
+_Use at your own risk! Incorrectly wired LEDs could damage your hardware or even be a fire hazard._
+
+This repo has the hardware plans and code for a simple RGB LED controller called the "discoball".
+
+Discoball is one of several similar hardware and software projects based on the ESP32 and ESP8266: furball, furball-mini, butterball.
+
+Discoball works with RGB LEDs that have built-in controllers like the Adafruit Neopixel, WS2812B, and uses the excellent [http://fastled.io/](FastLED) library to do all the heavy lifting.
 
 ## Hardware
 

@@ -60,13 +60,13 @@ unsigned animation_alternating_blink(bool),
   animation_throb(bool);
 
 animation_t animations[] = {
-  "alternating blink", animation_alternating_blink,
-  "blink", animation_blink,
-  "fire", animation_fire,
-  "invert", animation_invert,
-  "lightning", animation_lightning,
-  "march", animation_march,
-  "throb", animation_throb
+  "alternating blink", animation_alternating_blink, false,
+  "blink", animation_blink, false,
+  "fire", animation_fire, true,
+  "invert", animation_invert, false,
+  "lightning", animation_lightning, true,
+  "march", animation_march, false,
+  "throb", animation_throb, false
 };
 
 unsigned animations_length = sizeof(animations)/sizeof(animation_t);

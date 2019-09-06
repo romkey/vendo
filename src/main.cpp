@@ -110,6 +110,12 @@ void setup() {
   preset_set("off");
 #endif
 
+#ifdef DISCOBALL_CHEF_HAT
+  animation_set("fire");
+  animation_speed(5);
+  leds_brightness(20);
+#endif
+
 }
 
 bool status_changed = true;
