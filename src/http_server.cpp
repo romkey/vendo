@@ -94,8 +94,11 @@ static void handle_root() {
     "</head><body>"
     "<div class='container' style='background-color: white'>"
     "<h1><a href='/'>LED Controls</a></h1>"
+    "<div class='row'>"
+    "<div class='card col-sm border-dark border-rounded'>"
+    "<div class='card-body'>"
+    "<h2 class='card-title'>Color Presets</h2>"
     "<form action='/'>"
-    "<label for='preset'>Light pattern presets</label>"
     "<select name='preset' class='form-control'>";
 
   for(int i = 0; i < presets_length; i++) {
@@ -113,8 +116,22 @@ static void handle_root() {
   page += "</select>"
     "<br/>"
     "</form>"
+    "<hr/>"
+    "<form action='/' class='form-inline'>"
+    "<label for='r'>Red </label><input type='number' id='r' name='r' min='0' max='255' class='form-control'>"
+    "<label for='g'>Green </label><input type='number' id='g' name='g' min='0' max='255' class='form-control'>"
+    "<label for='b'>Blue </label><input type='number' id='b' name='b' min='0' max='255' class='form-control'>"
+    "<br/><input type='submit' class='form-control btn btn-primary'>"
+    "</form>"
+    "<div style='float: clear;'></div>"
+    "<hr/>"
+    "<div id='color-picker-container'></div>"
+    "</div>"
+    "</div>"
+    "<div class='card col-sm border-dark border-rounded'>"
+    "<div class='card-body'>"
+    "<h2 class='card-title'>Animations</h2>"
     "<form action='/'>"
-    "<label for='animation'>Animations</label>"
     "<select id='animation' name='animation' class='form-control'>";
 
   bool any_animation_ignores_presets = false;
@@ -140,22 +157,28 @@ static void handle_root() {
 
   page += "<br/>"
     "</form>"
+    "<form action='/' class='form'>"
+    "<label for='brightness'>Speed factor (0.5 = half, 2 = double)</label>"
+    "<input type='text' id='speed' name='speed' size='4' value='" + String(animation_speed()) + "'>"
+    "</form>"
     "<a href='/stop' class='btn btn-info'>Stop Animation</a>"
+    "</div>"
+    "</div>"
+    "</div><!- row ->"
+
+    "<div class='row'>"
+    "<div class='card col-sm border-dark border-rounded'>"
+    "<div class='card-body'>"
+    "<h2 class='card-title'>Brightness</h2>"
     "<div><form action='/'>"
     "  <label for='brightness'>Brightness (0-100%)</label>"
     "  <input type='number' id='brightness' name='brightness' min='0' max='100' value='" + String(leds_brightness()) + "'>"
     "</form></div>"
-    "<form action='/' class='form'>"
-    "<label for='brightness'>Animation speed factor (0.5 = half speed, 2 = double speed)</label>"
-    "<input type='text' id='speed' name='speed' size='4' value='" + String(animation_speed()) + "'>"
-    "</form>"
-    "<form action='/' class='form-inline'>"
-    "<div id='color-picker-container'></div>"
-    "<label for='r'>Red </label><input type='number' id='r' name='r' min='0' max='255' class='form-control'>"
-    "<label for='g'>Green </label><input type='number' id='g' name='g' min='0' max='255' class='form-control'>"
-    "<label for='b'>Blue </label><input type='number' id='b' name='b' min='0' max='255' class='form-control'>"
-    "<br/><input type='submit' class='form-control btn btn-primary'>"
-    "</form>"
+
+    "</div>"
+    "</div>"
+    "</div><!- row ->"
+
 #ifdef HAS_BME280
     "<div>"
     "Current temperature is ";

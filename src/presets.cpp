@@ -125,7 +125,7 @@ static void random() {
 
 static void off() {
   for(int i = 0; i < NUM_LEDS; i++)
-	leds[0] = 0;
+    leds[i] = 0;
 
   FastLED.show();
 }
