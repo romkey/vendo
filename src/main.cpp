@@ -76,7 +76,7 @@ void setup() {
   Serial.println("[http_server]");
 
 #ifdef USE_MQTT
-  mqtt_setup();
+  mqtt_setup(MQTT_HOST, MQTT_PORT, MQTT_UUID, MQTT_USER, MQTT_PASS);
   Serial.println("[mqtt]");
 
   homebus_mqtt_setup();

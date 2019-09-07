@@ -157,10 +157,12 @@ static void handle_root() {
 
   page += "<br/>"
     "</form>"
+    "<hr/>"
     "<form action='/' class='form'>"
     "<label for='brightness'>Speed factor (0.5 = half, 2 = double)</label>"
-    "<input type='text' id='speed' name='speed' size='4' value='" + String(animation_speed()) + "'>"
+    "<input type='number' step='0.1' class='form-control' id='speed' name='speed' size='4' value='" + String(animation_speed()) + "'>"
     "</form>"
+    "<hr/>"
     "<a href='/stop' class='btn btn-info'>Stop Animation</a>"
     "</div>"
     "</div>"
@@ -172,7 +174,7 @@ static void handle_root() {
     "<h2 class='card-title'>Brightness</h2>"
     "<div><form action='/'>"
     "  <label for='brightness'>Brightness (0-100%)</label>"
-    "  <input type='number' id='brightness' name='brightness' min='0' max='100' value='" + String(leds_brightness()) + "'>"
+    "  <input type='number' step='0.1' class='form-control' id='brightness' name='brightness' min='0' max='100' value='" + String(leds_brightness()) + "'>"
     "</form></div>"
 
     "</div>"

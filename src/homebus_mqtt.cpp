@@ -94,16 +94,15 @@ static void homebus_mqtt_publish_status() {
   mqtt_publish(homebus_endpoint.c_str(), buf, true);
 }
 
-void homebus_mqtt_callback(const char* topic, const char* command_buffer) {
+void homebus_mqtt_callback(const char* topic, char* command_buffer) {
+  unsigned length = strlen(command_buffer);
   char* command = command_buffer;
+
   // command is meant to be a valid json string, so get rid of the quotes
   if(command[0] == '"' && command[length-1] == '"') {
     command[length-1] = '\0';
     command += 1;
   }
-
-  char buffer[length + 30];
-  snprintf(buffer, length+30, "{ \"cmd\": \"%s\" }", command);
 
   Serial.printf("command %s\n", command);
 
@@ -160,7 +159,7 @@ void homebus_mqtt_callback(const char* topic, const char* command_buffer) {
     if(preset_set(&command[7]))
       return;
 
-    mqtt_client.publish("/leds/$error", command);
+    mqtt_publish("/leds/$error", command);
     return;
   }
 
@@ -171,7 +170,7 @@ void homebus_mqtt_callback(const char* topic, const char* command_buffer) {
     if(animation_set(&command[10]))
       return;
 
-    mqtt_client.publish("/leds/$error", command);
+    mqtt_publish("/leds/$error", command);
     return;
   }
 }
