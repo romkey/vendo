@@ -37,14 +37,13 @@ int bootCount = 0;
 RTC_DATA_ATTR int bootCount = 0;
 #endif
 
-static const char *wifi_credentials[] = {
-  WIFI_SSID1, WIFI_PASSWORD1,
-  WIFI_SSID2, WIFI_PASSWORD2,
-  WIFI_SSID3, WIFI_PASSWORD3
-};
-
 void setup() {
   const char* hostname = "";
+  const char *wifi_credentials[] = {
+    WIFI_SSID1, WIFI_PASSWORD1,
+    WIFI_SSID2, WIFI_PASSWORD2,
+    WIFI_SSID3, WIFI_PASSWORD3
+  };
 
   bootCount++;
 
