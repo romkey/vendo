@@ -7,6 +7,7 @@
 #include "animations.h"
 
 #include "multiball/bme280.h"
+#include "multiball/wifi.h"
 
 #ifdef ESP8266
 #include <ESP8266WebServer.h>
@@ -58,6 +59,10 @@ void http_server_handle() {
 }
 
 static void handle_root() {
+  byte mac_address[6];
+
+  WiFi.macAddress(mac_address);
+
   if(server.hasArg("preset"))
     preset_set(server.arg("preset").c_str());
 
@@ -177,6 +182,21 @@ static void handle_root() {
     "  <input type='number' step='0.1' class='form-control' id='brightness' name='brightness' min='0' max='100' value='" + String(leds_brightness()) + "'>"
     "</form></div>"
 
+    "</div>"
+    "</div>"
+    "</div><!- row ->"
+
+    "<div class='row'>"
+    "<div class='card col-sm border-dark border-rounded'>"
+    "<div class='card-body'>"
+    "<h2 class='card-title'>System</h2>"
+    "<b>Hostname:</b> " + String(wifi_hostname()) + 
+    " <b>IP address:</b> " + String(WiFi.localIP()[0]) + "."  + String(WiFi.localIP()[1]) + "."  + String(WiFi.localIP()[2]) + "."  + String(WiFi.localIP()[3]) +
+    " <b>MAC address:</b> " + String(mac_address[0], 16) + ":" + String(mac_address[1], 16) + ":" + String(mac_address[2], 16) + ":" + String(mac_address[3], 16) + ":" + String(mac_address[4], 16) + ":" + String(mac_address[5], 16) +
+    "<br/><b>Wifi network:</b> " + WiFi.SSID() +
+    " <b>RSSI</b>: " + String(WiFi.RSSI()) +
+    " <b>subnet mask:</b>" + String(WiFi.subnetMask()[0]) + "."  + String(WiFi.subnetMask()[1]) + "."  + String(WiFi.subnetMask()[2]) + "."  + String(WiFi.subnetMask()[3]) +
+    " <b>default router:</b>" + String(WiFi.gatewayIP()[0]) + "."  + String(WiFi.gatewayIP()[1]) + "."  + String(WiFi.gatewayIP()[2]) + "."  + String(WiFi.gatewayIP()[3]) +
     "</div>"
     "</div>"
     "</div><!- row ->"
