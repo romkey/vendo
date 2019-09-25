@@ -13,7 +13,7 @@
 #include "homebus_mqtt.h"
 
 #ifdef HAS_BME280
-#include "bme280.h"
+#include "multiball/bme280.h"
 #endif
 
 static Uptime uptime;
@@ -30,7 +30,7 @@ static void homebus_mqtt_publish_status();
 
 void homebus_mqtt_setup() {
   homebus_endpoint = String("/homebus/device/") + MQTT_UUID;
-  mqtt_subscribe(homebus_endpoint.c_str());
+  mqtt_subscribe((homebus_endpoint + "/cmd").c_str());
 
   homebus_mqtt_start_announcement();
 }

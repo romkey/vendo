@@ -53,7 +53,7 @@ void setup() {
   Serial.println("Hello World!");
   Serial.printf("Build %s\n", build_info);
 
-  if(wifi_begin(wifi_credentials, 3)) {
+  if(wifi_begin(wifi_credentials, 3, "discoball")) {
     Serial.println(WiFi.localIP());
     Serial.println("[wifi]");
 
@@ -113,6 +113,27 @@ void setup() {
   animation_set("fire");
   animation_speed(5);
   leds_brightness(20);
+#endif
+
+#ifdef DISCOBALL_MAKER_FAIRE
+  preset_set("rainbow");
+  animation_set("march");
+  animation_speed(5);
+  leds_brightness(40);
+#endif
+
+#ifdef DISCOBALL_NO_MQTT
+  preset_set("red");
+  Serial.println("red");
+  delay(2000);
+  preset_set("green");
+  Serial.println("green");
+  delay(2000);
+  preset_set("blue");
+  Serial.println("blue");
+  delay(2000);
+  animation_set("fire");
+  animation_speed(5);
 #endif
 
 }
