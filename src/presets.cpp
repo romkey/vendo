@@ -3,8 +3,10 @@
 #include "animations.h"
 #include "presets.h"
 
-extern bool status_changed;
+#include <SPIFFS.h>
+#include <FS.h>
 
+extern bool status_changed;
 
 /*
  * PRESETS
@@ -15,6 +17,10 @@ extern bool status_changed;
  *
  * Setting a preset stops the current animation.
  */
+
+void preset_setup() {
+  preset_restore();
+}
 
 static void white() {
   leds_fill(CRGB::White);
@@ -152,6 +158,10 @@ preset_t presets[] = {
 unsigned presets_length = sizeof(presets)/sizeof(preset_t);
 preset_t *current_preset;
 
+preset_t preset_use_rgb = {
+  "RGB", NULL
+};
+
 void preset_set(preset_t *preset) {
   if(preset && preset->preset)
     (*preset->preset)();
@@ -188,5 +198,58 @@ void preset_rgb(uint8_t red, uint8_t green, uint8_t blue) {
 
   animation_stop();
   leds_on();
+  current_preset = &preset_use_rgb;
   leds_fill(CRGB(red, green, blue));
+}
+
+#define PRESETS_PERSISTENCE_FILE "/config/preset"
+#define PRESETS_PERSISTENCE_FILE_RGB "/config/preset_rgb"
+
+void preset_persist() {
+  File f;
+
+  preset_clear_persist();
+
+  if(current_preset) {
+    f = SPIFFS.open(PRESETS_PERSISTENCE_FILE, FILE_WRITE);
+    f.println(current_preset->name);
+    f.close();
+    return;
+  }
+
+  if(current_preset == &preset_use_rgb) {
+    f = SPIFFS.open(PRESETS_PERSISTENCE_FILE_RGB, FILE_WRITE);
+    f.println(current_preset->name);
+    f.close();
+    return;
+  }
+}
+
+void preset_clear_persist() {
+  SPIFFS.remove(PRESETS_PERSISTENCE_FILE);
+  SPIFFS.remove(PRESETS_PERSISTENCE_FILE_RGB);
+}
+
+void preset_restore() {
+  File file = SPIFFS.open(PRESETS_PERSISTENCE_FILE, FILE_READ);
+  if(file) {
+    char buffer[32];
+    while(file.available()) {
+      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
+      buffer[length > 0 ? length - 1 : 0] =  '\0';
+    }
+
+    preset_set(buffer);
+  }
+
+  file = SPIFFS.open(PRESETS_PERSISTENCE_FILE_RGB, FILE_READ);
+  if(file) {
+    char buffer[32];
+    while(file.available()) {
+      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
+      buffer[length] =  '\0';
+    }
+
+    file.close();
+  }
 }

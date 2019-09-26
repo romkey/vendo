@@ -2,8 +2,10 @@
 #include "leds.h"
 #include "animations.h"
 
-extern bool status_changed;
+#include <SPIFFS.h>
+#include <FS.h>
 
+extern bool status_changed;
 
 /*
  * ANIMATIONS
@@ -50,6 +52,10 @@ extern bool status_changed;
  * They're kept in the animations array along with human-friendly names for them.
  */
 
+
+void animation_setup() {
+  animation_restore();
+}
 
 unsigned animation_alternating_blink(bool),
   animation_blink(bool),
@@ -132,4 +138,52 @@ bool animation_set(const char* name) {
   }
 
   return false;
+}
+
+#define ANIMATION_PERSISTENCE_FILE "/config/animation"
+#define ANIMATION_SPEED_PERSISTENCE_FILE "/config/animation_speed"
+
+void animation_persist() {
+  if(current_animation) {
+    File f = SPIFFS.open(ANIMATION_PERSISTENCE_FILE, FILE_WRITE);
+    f.println(current_animation->name);
+    f.close();
+    return;
+  }
+
+  animation_clear_persist();
+}
+
+void animation_clear_persist() {
+  SPIFFS.remove(ANIMATION_PERSISTENCE_FILE);
+}
+
+void animation_restore() {
+  File file = SPIFFS.open(ANIMATION_PERSISTENCE_FILE, FILE_READ);
+
+  if(file) {
+    char buffer[32];
+    while(file.available()) {
+      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
+      buffer[length > 0 ? length - 1 : 0] =  '\0';
+    }
+
+    animation_set(buffer);
+
+    file.close();
+  }
+
+  file = SPIFFS.open(ANIMATION_SPEED_PERSISTENCE_FILE, FILE_READ);
+
+  if(file) {
+    char buffer[32];
+    while(file.available()) {
+      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
+      buffer[length] =  '\0';
+    }
+
+    animation_speed(atof(buffer));
+
+    file.close();
+  }
 }

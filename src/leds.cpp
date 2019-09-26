@@ -2,6 +2,9 @@
 #include "leds.h"
 #include "animations.h"
 
+#include <SPIFFS.h>
+#include <FS.h>
+
 extern bool status_changed;
 
 CRGB leds[NUM_LEDS];
@@ -14,6 +17,7 @@ void leds_setup() {
 #endif
 
   leds_brightness(100);
+  leds_restore();
 }
 
 void leds_handle() {
@@ -81,3 +85,45 @@ void leds_fill(CRGB color) {
   FastLED.show();
 }
 
+#define LEDS_PERSISTENCE_FILE "/config/leds"
+#define LEDS_BRIGHTNESS_PERSISTENCE_FILE "/config/leds_brightness"
+
+void leds_clear_persist() {
+  SPIFFS.remove(LEDS_PERSISTENCE_FILE);
+  SPIFFS.remove(LEDS_BRIGHTNESS_PERSISTENCE_FILE);
+}
+
+// don't even save state if LEDs are on
+void leds_persist() {
+  File file = SPIFFS.open(LEDS_BRIGHTNESS_PERSISTENCE_FILE, FILE_WRITE);
+  file.println(stored_brightness);
+  file.close();
+
+  if(leds_state) {
+    SPIFFS.remove(LEDS_PERSISTENCE_FILE);
+    return;
+  }
+
+  file = SPIFFS.open(LEDS_PERSISTENCE_FILE, FILE_WRITE);
+  file.close();
+}
+
+
+void leds_restore() {
+  File file = SPIFFS.open(LEDS_PERSISTENCE_FILE, "r");
+  if(file) {
+    leds_off();
+    file.close();
+  }
+
+  file =  SPIFFS.open(LEDS_BRIGHTNESS_PERSISTENCE_FILE, "r");
+  if(file) {
+    char buffer[32];
+    while(file.available()) {
+      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
+      buffer[length] =  '\0';
+    }
+    leds_brightness(atoi(buffer));
+    file.close();
+  }
+}

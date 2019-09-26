@@ -1,3 +1,6 @@
+#include <SPIFFS.h>
+#include <FS.h>
+
 #include "config.h"
 
 #include "http_server.h"
@@ -32,19 +35,23 @@ static WebServer server(80);
 //  /?sequence=NAME or /?animation=NAME
 //  /?brightness=XXX
 //  /?speed=XXX
+// /persist
 // /on
 // /off
 // /start
 // /stop
 // /status.json
 
-static void handle_root(), handle_on(), handle_off(), handle_start(), handle_stop(), handle_status();
+static void handle_root(), handle_on(), handle_off(), handle_start(), handle_stop(), handle_status(), handle_persist(), handle_clear_persist();
 
 void http_server_setup() {
   server.on("/", handle_root);
+  server.on("/persist", handle_persist);
+  server.on("/clear_persist", handle_clear_persist);
   server.on("/on", handle_on);
   server.on("/off", handle_off);
   server.on("/stop", handle_stop);
+  server.on("/restart", []() { ESP.restart(); });
   server.on("/status.json", handle_status);
 
   server.onNotFound([]() {
@@ -190,6 +197,9 @@ static void handle_root() {
     "<div class='card col-sm border-dark border-rounded'>"
     "<div class='card-body'>"
     "<h2 class='card-title'>System</h2>"
+    "<a href='/persist' class='btn btn-success'>Start up with current settings</a><br/>"
+    "<a href='/clear_persist' class='btn btn-danger'>Clear start up settings</a><br/>"
+    "<a href='/restart' class='btn btn-dark'>Restart</a><br/>"
     "<b>Hostname:</b> " + String(wifi_hostname()) + 
     " <b>IP address:</b> " + String(WiFi.localIP()[0]) + "."  + String(WiFi.localIP()[1]) + "."  + String(WiFi.localIP()[2]) + "."  + String(WiFi.localIP()[3]) +
     " <b>MAC address:</b> " + String(mac_address[0], 16) + ":" + String(mac_address[1], 16) + ":" + String(mac_address[2], 16) + ":" + String(mac_address[3], 16) + ":" + String(mac_address[4], 16) + ":" + String(mac_address[5], 16) +
@@ -197,16 +207,46 @@ static void handle_root() {
     " <b>RSSI</b>: " + String(WiFi.RSSI()) +
     " <b>subnet mask:</b>" + String(WiFi.subnetMask()[0]) + "."  + String(WiFi.subnetMask()[1]) + "."  + String(WiFi.subnetMask()[2]) + "."  + String(WiFi.subnetMask()[3]) +
     " <b>default router:</b>" + String(WiFi.gatewayIP()[0]) + "."  + String(WiFi.gatewayIP()[1]) + "."  + String(WiFi.gatewayIP()[2]) + "."  + String(WiFi.gatewayIP()[3]) +
-    "</div>"
+    "<br/><b>Number of LEDs:</b> " + String(NUM_LEDS) +
+#define STRINGIZE_NX(A) #A
+#define STRINGIZE(A) STRINGIZE_NX(A)
+    " <b>LED controller:</b> " + STRINGIZE(LED_TYPE) +
+    " <b>R-G-B order:</b> " + STRINGIZE(LED_RGB) +
+    " <b>Data pin:</b> " + String(LED_DATA_PIN) +
+#ifdef LED_CLOCK_PIN
+    " <b>Clock pin:</b> " + String(LED_CLOCK_PIN) +
+#else
+    " <b>Clock pin:</b> unused" +
+#endif
+    "<br/><b>Files:</b>";
+
+  File root = SPIFFS.open("/");
+  File file = root.openNextFile();
+ 
+  while(file) {
+    page += " " + String(file.name()) + " ";
+    file.close();
+    file = root.openNextFile();
+  }
+  root.close();
+
+    page += "</div>"
     "</div>"
     "</div><!- row ->"
 
 #ifdef HAS_BME280
-    "<div>"
-    "Current temperature is ";
-  page += String(bme280_current_temperature());
-  page += "°C</div>"
+    "<div class='row'>"
+    "<div class='card col-sm border-dark border-rounded'>"
+    "<div class='card-body'>"
+    "<h2 class='card-title'>Environment</h2>"
+    "<b>Temperature:</b> " + String(bme280_current_temperature()) + "°C"
+    "<br/><b>Pressure:</b> " + String(bme280_current_pressure()) + ""
+    "<br/><b>Humidity:</b> " + String(bme280_current_humidity()) + "%"
+    "</div>"
+    "</div>"
+    "</div><!- row ->"
 #endif
+
     "<div class='row'>"
     "Want to hack this?&nbsp; <a href='https://github.com/romkey/vendo'>https://github.com/romkey/vendo</a>"
     "</div>"
@@ -257,6 +297,24 @@ static void handle_start() {
 
 static void handle_stop() {
   animation_stop();
+  server.sendHeader("Location", "/");
+  server.send(302);
+}
+
+static void handle_persist() {
+  leds_persist();
+  preset_persist();
+  animation_persist();
+
+  server.sendHeader("Location", "/");
+  server.send(302);
+}
+
+static void handle_clear_persist() {
+  leds_clear_persist();
+  preset_clear_persist();
+  animation_clear_persist();
+
   server.sendHeader("Location", "/");
   server.send(302);
 }

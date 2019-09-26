@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <SPIFFS.h>
 
 #include "config.h"
 
@@ -53,6 +54,11 @@ void setup() {
   Serial.println("Hello World!");
   Serial.printf("Build %s\n", build_info);
 
+  if(!SPIFFS.begin(true))
+    Serial.println("An Error has occurred while mounting SPIFFS");
+  else
+    Serial.println("[spiffs]");
+
   if(wifi_begin(wifi_credentials, 3, "discoball")) {
     Serial.println(WiFi.localIP());
     Serial.println("[wifi]");
@@ -84,6 +90,12 @@ void setup() {
 
   leds_setup();
   Serial.println("[leds]");
+
+  preset_setup();
+  Serial.println("[presets]");
+
+  animation_setup();
+  Serial.println("[animations]");
 
 #ifdef HAS_BME280
   bme280_setup();
