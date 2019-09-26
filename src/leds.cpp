@@ -121,7 +121,7 @@ void leds_restore() {
     char buffer[32];
     while(file.available()) {
       int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length] =  '\0';
+      buffer[length > 0 ? length - 1 : 0] =  '\0';
     }
     leds_brightness(atoi(buffer));
     file.close();

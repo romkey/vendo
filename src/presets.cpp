@@ -129,7 +129,7 @@ static void random() {
   FastLED.show();
 }
 
-static void off() {
+static void black() {
   for(int i = 0; i < NUM_LEDS; i++)
     leds[i] = 0;
 
@@ -152,7 +152,7 @@ preset_t presets[] = {
   "random", random,
   "reverse watermelon", reverse_watermelon,
   "xmas", xmas,
-  "off", off
+  "black", black
 };
 
 unsigned presets_length = sizeof(presets)/sizeof(preset_t);

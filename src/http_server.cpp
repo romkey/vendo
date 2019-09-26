@@ -48,7 +48,6 @@ void http_server_setup() {
   server.on("/", handle_root);
   server.on("/persist", handle_persist);
   server.on("/clear_persist", handle_clear_persist);
-  server.on("/on", handle_on);
   server.on("/off", handle_off);
   server.on("/stop", handle_stop);
   server.on("/restart", []() { ESP.restart(); });
@@ -113,6 +112,9 @@ static void handle_root() {
     "<form action='/'>"
     "<select name='preset' class='form-control'>";
 
+  if(current_preset == NULL)
+    page += "  <option value='' selected disabled hidden>none selected</option>";
+
   for(int i = 0; i < presets_length; i++) {
     page += "  <option value='";
     page += presets[i].name;
@@ -145,6 +147,9 @@ static void handle_root() {
     "<h2 class='card-title'>Animations</h2>"
     "<form action='/'>"
     "<select id='animation' name='animation' class='form-control'>";
+
+  if(current_animation == NULL)
+    page += "  <option value='' selected disabled hidden>none selected</option>";
 
   bool any_animation_ignores_presets = false;
   for(int i = 0; i < animations_length; i++) {
@@ -188,6 +193,8 @@ static void handle_root() {
     "  <label for='brightness'>Brightness (0-100%)</label>"
     "  <input type='number' step='0.1' class='form-control' id='brightness' name='brightness' min='0' max='100' value='" + String(leds_brightness()) + "'>"
     "</form></div>"
+
+    "<a href='/off' class='btn btn-dark'>Turn Off</a><br/>"
 
     "</div>"
     "</div>"
@@ -278,14 +285,12 @@ static void handle_root() {
   server.send(200, "text/html", page);
 }
 
-static void handle_on() {
-  leds_on();
-  server.send(302, "text/plain", "/");
-}
-
 static void handle_off() {
   preset_set("off");
-  animation_stop();
+  leds_off();
+  current_preset = NULL;
+  current_animation = NULL;
+  animation_speed(1);
   server.sendHeader("Location", "/");
   server.send(302);
 }

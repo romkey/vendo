@@ -144,18 +144,22 @@ bool animation_set(const char* name) {
 #define ANIMATION_SPEED_PERSISTENCE_FILE "/config/animation_speed"
 
 void animation_persist() {
+  File f = SPIFFS.open(ANIMATION_SPEED_PERSISTENCE_FILE, FILE_WRITE);
+  f.println(speed);
+  f.close();
+
   if(current_animation) {
-    File f = SPIFFS.open(ANIMATION_PERSISTENCE_FILE, FILE_WRITE);
+    f = SPIFFS.open(ANIMATION_PERSISTENCE_FILE, FILE_WRITE);
     f.println(current_animation->name);
     f.close();
     return;
-  }
-
-  animation_clear_persist();
+  } else
+    SPIFFS.remove(ANIMATION_PERSISTENCE_FILE);
 }
 
 void animation_clear_persist() {
   SPIFFS.remove(ANIMATION_PERSISTENCE_FILE);
+  SPIFFS.remove(ANIMATION_SPEED_PERSISTENCE_FILE);
 }
 
 void animation_restore() {
@@ -179,7 +183,7 @@ void animation_restore() {
     char buffer[32];
     while(file.available()) {
       int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length] =  '\0';
+      buffer[length > 0 ? length - 1 : 0] =  '\0';
     }
 
     animation_speed(atof(buffer));
