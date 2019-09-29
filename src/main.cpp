@@ -102,10 +102,6 @@ void setup() {
   Serial.println("[bme280]");
 #endif
 
-#ifdef DISCOBALL_DISCO_1
-  preset_set("pride");
-  animation_set("march");
-#endif
 
 #ifdef DISCOBALL_CTRLH_3
   preset_set("off");
