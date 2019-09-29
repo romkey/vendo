@@ -11,6 +11,7 @@
 
 #include "multiball/bme280.h"
 #include "multiball/wifi.h"
+#include "multiball/mqtt.h"
 
 #ifdef ESP8266
 #include <ESP8266WebServer.h>
@@ -224,6 +225,11 @@ static void handle_root() {
     " <b>Clock pin:</b> " + String(LED_CLOCK_PIN) +
 #else
     " <b>Clock pin:</b> unused" +
+#endif
+#ifdef USE_MQTT
+    "<br/><b>MQTT (" + (mqtt_is_connected() ? "" : "not ") + "connected)broker:</b> " + MQTT_HOST + " <b>port:</b> " + String(MQTT_PORT) + " <b>username:</b> " + MQTT_USER + " <b>UUID:</b> " + MQTT_UUID +
+#else
+    "<b>No MQTT support</b>"
 #endif
     "<br/><b>Files:</b>";
 
