@@ -107,24 +107,8 @@ void setup() {
   animation_set("march");
 #endif
 
-#ifdef DISCOBALL_CTRLH_1
-  preset_set("white");
-#endif
-
-#ifdef DISCOBALL_CTRLH_2
-  preset_set("rainbow");
-  animation_set("march");
-  animation_speed(3);
-#endif
-
 #ifdef DISCOBALL_CTRLH_3
   preset_set("off");
-#endif
-
-#ifdef DISCOBALL_CHEF_HAT
-  animation_set("fire");
-  animation_speed(5);
-  leds_brightness(20);
 #endif
 
 #ifdef DISCOBALL_MAKER_FAIRE
