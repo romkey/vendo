@@ -35,6 +35,7 @@ static WebServer server(80);
 //  /?preset=NAME
 //  /?sequence=NAME or /?animation=NAME
 //  /?brightness=XXX
+//  /?maximum_brightness=XXX
 //  /?speed=XXX
 // /persist
 // /on
@@ -90,6 +91,10 @@ static void handle_root() {
 
   if(server.hasArg("brightness"))
     leds_brightness(atoi(server.arg("brightness").c_str()));
+
+  if(server.hasArg("maximum_brightness"))
+    leds_maximum_brightness(atoi(server.arg("maximum_brightness").c_str()));
+
   if(server.hasArg("speed")) {
     float speed = server.arg("speed").toFloat();
 
@@ -177,7 +182,7 @@ static void handle_root() {
     "</form>"
     "<hr/>"
     "<form action='/' class='form'>"
-    "<label for='brightness'>Speed factor (0.5 = half, 2 = double)</label>"
+    "<label for='speed'>Speed factor (0.5 = half, 2 = double)</label>"
     "<input type='number' step='0.1' class='form-control' id='speed' name='speed' size='4' value='" + String(animation_speed()) + "'>"
     "</form>"
     "<hr/>"
@@ -191,7 +196,12 @@ static void handle_root() {
     "<div class='card-body'>"
     "<h2 class='card-title'>Brightness</h2>"
     "<div><form action='/'>"
-    "  <label for='brightness'>Brightness (0-100%)</label>"
+    "  <label for='brightness'>Brightness (0-100%)";
+
+  if(leds_maximum_brightness() != 100)
+    page += " (maximum brightness " + String(leds_maximum_brightness()) + "%)";
+
+  page += "</label>"
     "  <input type='number' step='0.1' class='form-control' id='brightness' name='brightness' min='0' max='100' value='" + String(leds_brightness()) + "'>"
     "</form></div>"
 
