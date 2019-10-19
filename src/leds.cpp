@@ -132,42 +132,9 @@ void leds_restore() {
 
   results = App.config.get("leds", "brightness", &success);
   if(success)
-    leds_brightness(atoi(results.c_str()));
+    leds_brightness(results.toInt());
 
   results = App.config.get("leds", "maximum_brightness", &success);
   if(success)
-    leds_maximum_brightness(atoi(results.c_str()));
-
-
-
-
-=======
-  File file = SPIFFS.open(LEDS_PERSISTENCE_FILE, FILE_READ);
-  if(file) {
-    leds_off();
-    file.close();
-  }
-
-  file =  SPIFFS.open(LEDS_BRIGHTNESS_PERSISTENCE_FILE, FILE_READ);
-  if(file) {
-    char buffer[32];
-    while(file.available()) {
-      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length > 0 ? length - 1 : 0] =  '\0';
-    }
-    leds_brightness(atoi(buffer));
-    file.close();
-  }
-
-  file =  SPIFFS.open(LEDS_MAXIMUM_BRIGHTNESS_PERSISTENCE_FILE, FILE_READ);
-  if(file) {
-    char buffer[32];
-    while(file.available()) {
-      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length > 0 ? length - 1 : 0] =  '\0';
-    }
-    leds_maximum_brightness(atoi(buffer));
-    file.close();
-  }
->>>>>>> a1ca377b090cfe2b3f37d7e466f47e5602fab48c
+    leds_maximum_brightness(results.toInt());
 }

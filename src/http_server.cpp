@@ -90,10 +90,10 @@ static void handle_root() {
   }
 
   if(server.hasArg("brightness"))
-    leds_brightness(atoi(server.arg("brightness").c_str()));
+    leds_brightness(server.arg("brightness").toInt());
 
   if(server.hasArg("maximum_brightness"))
-    leds_maximum_brightness(atoi(server.arg("maximum_brightness").c_str()));
+    leds_maximum_brightness(server.arg("maximum_brightness").toInt());
 
   if(server.hasArg("speed")) {
     float speed = server.arg("speed").toFloat();

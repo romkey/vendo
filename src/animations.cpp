@@ -163,5 +163,5 @@ void animation_restore() {
 
   results = App.config.get("animation", "speed", &success);
   if(success)
-    animation_speed(atof(results.c_str()));
+    animation_speed(results.toFloat());
 }
