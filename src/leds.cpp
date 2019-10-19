@@ -1,11 +1,11 @@
+#include <multiball/app.h>
+
 #include "config.h"
 #include "leds.h"
 #include "animations.h"
 
 #include <SPIFFS.h>
 #include <FS.h>
-
-extern bool status_changed;
 
 CRGB leds[NUM_LEDS];
 
@@ -35,13 +35,13 @@ bool leds_status() {
 }
 
 void leds_on() {
-  status_changed = true;
+  App.updates_available(true);
 
   leds_state = true;
 }
 
 void leds_off() {
-  status_changed = true;
+  App.updates_available(true);
 
   leds_state = false;
 
@@ -60,7 +60,7 @@ void leds_brightness(uint8_t brightness) {
   if(brightness == stored_brightness)
     return;
 
-  status_changed = true;
+  App.updates_available(true);
 
   if(brightness > 100)
     brightness = 100;
@@ -89,41 +89,21 @@ void leds_fill(CRGB color) {
 #define LEDS_BRIGHTNESS_PERSISTENCE_FILE "/config/leds_brightness"
 
 void leds_clear_persist() {
-  SPIFFS.remove(LEDS_PERSISTENCE_FILE);
-  SPIFFS.remove(LEDS_BRIGHTNESS_PERSISTENCE_FILE);
+  App.config.clear("leds", "");
+  App.config.clear("leds", "brightness");
 }
 
 // don't even save state if LEDs are on
 void leds_persist() {
-  File file = SPIFFS.open(LEDS_BRIGHTNESS_PERSISTENCE_FILE, FILE_WRITE);
-  file.println(stored_brightness);
-  file.close();
-
-  if(leds_state) {
-    SPIFFS.remove(LEDS_PERSISTENCE_FILE);
-    return;
-  }
-
-  file = SPIFFS.open(LEDS_PERSISTENCE_FILE, FILE_WRITE);
-  file.close();
+  App.config.set("leds", "brightness", String(stored_brightness));
 }
 
 
 void leds_restore() {
-  File file = SPIFFS.open(LEDS_PERSISTENCE_FILE, "r");
-  if(file) {
-    leds_off();
-    file.close();
-  }
+  boolean success = false;
+  String results;
 
-  file =  SPIFFS.open(LEDS_BRIGHTNESS_PERSISTENCE_FILE, "r");
-  if(file) {
-    char buffer[32];
-    while(file.available()) {
-      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length > 0 ? length - 1 : 0] =  '\0';
-    }
-    leds_brightness(atoi(buffer));
-    file.close();
-  }
+  results = App.config.get("leds", "brightness", &success);
+  if(success)
+    leds_brightness(atoi(results.c_str()));
 }

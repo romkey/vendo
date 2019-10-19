@@ -1,3 +1,5 @@
+#include <multiball/app.h>
+
 #include "config.h"
 #include "leds.h"
 #include "animations.h"
@@ -5,8 +7,6 @@
 
 #include <SPIFFS.h>
 #include <FS.h>
-
-extern bool status_changed;
 
 /*
  * PRESETS
@@ -182,7 +182,7 @@ bool preset_set(const char* name) {
   preset_t *preset = preset_lookup(name);
 
   if(preset) {
-    status_changed = true;
+    App.updates_available(true);
 
     animation_stop();
     leds_on();
@@ -194,7 +194,7 @@ bool preset_set(const char* name) {
 }
 
 void preset_rgb(uint8_t red, uint8_t green, uint8_t blue) {
-  status_changed = true;
+  App.updates_available(true);
 
   animation_stop();
   leds_on();
@@ -202,54 +202,30 @@ void preset_rgb(uint8_t red, uint8_t green, uint8_t blue) {
   leds_fill(CRGB(red, green, blue));
 }
 
-#define PRESETS_PERSISTENCE_FILE "/config/preset"
-#define PRESETS_PERSISTENCE_FILE_RGB "/config/preset_rgb"
+
 
 void preset_persist() {
-  File f;
-
   preset_clear_persist();
 
-  if(current_preset) {
-    f = SPIFFS.open(PRESETS_PERSISTENCE_FILE, FILE_WRITE);
-    f.println(current_preset->name);
-    f.close();
-    return;
-  }
+  if(current_preset)
+    App.config.set("presets", "", current_preset->name);
 
-  if(current_preset == &preset_use_rgb) {
-    f = SPIFFS.open(PRESETS_PERSISTENCE_FILE_RGB, FILE_WRITE);
-    f.println(current_preset->name);
-    f.close();
-    return;
-  }
+  if(current_preset == &preset_use_rgb)
+    App.config.set("presets", "rgb", "");
 }
 
 void preset_clear_persist() {
-  SPIFFS.remove(PRESETS_PERSISTENCE_FILE);
-  SPIFFS.remove(PRESETS_PERSISTENCE_FILE_RGB);
+  App.config.clear("presets", "");
+  App.config.clear("presets", "rgb");
 }
 
 void preset_restore() {
-  File file = SPIFFS.open(PRESETS_PERSISTENCE_FILE, FILE_READ);
-  if(file) {
-    char buffer[32];
-    while(file.available()) {
-      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length > 0 ? length - 1 : 0] =  '\0';
-    }
+  boolean success = false;
+  String results;
 
-    preset_set(buffer);
-  }
+  results = App.config.get("presets", "", &success);
+  if(success)
+    preset_set(results.c_str());
 
-  file = SPIFFS.open(PRESETS_PERSISTENCE_FILE_RGB, FILE_READ);
-  if(file) {
-    char buffer[32];
-    while(file.available()) {
-      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length] =  '\0';
-    }
-
-    file.close();
-  }
+  results = App.config.get("presets", "rgb", &success);
 }

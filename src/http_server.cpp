@@ -233,16 +233,18 @@ static void handle_root() {
 #endif
     "<br/><b>Files:</b>";
 
-  File root = SPIFFS.open("/");
-  File file = root.openNextFile();
+    File root = SPIFFS.open("/");
+    File file = root.openNextFile();
  
-  while(file) {
-    page += " " + String(file.name()) + " ";
-    file.close();
-    file = root.openNextFile();
-  }
-  root.close();
+    while(file) {
+      page += " " + String(file.name()) + " ";
+      file.close();
+      file = root.openNextFile();
+    }
 
+    root.close();
+
+    page += "<br/><b>SPIFFS:</b> " + String(SPIFFS.usedBytes()) + " bytes used of " + String(SPIFFS.totalBytes()) + " available";
     page += "</div>"
     "</div>"
     "</div><!- row ->"

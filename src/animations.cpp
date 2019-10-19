@@ -1,11 +1,11 @@
+#include <multiball/app.h>
+
 #include "config.h"
 #include "leds.h"
 #include "animations.h"
 
 #include <SPIFFS.h>
 #include <FS.h>
-
-extern bool status_changed;
 
 /*
  * ANIMATIONS
@@ -85,7 +85,7 @@ static bool running = true;
 void animation_start() {
   leds_on();
 
-  status_changed = true;
+  App.updates_available(true);
 
   (*current_animation->animation)(true);
   running = true;
@@ -96,7 +96,7 @@ void animation_stop() {
 }
 
 void animation_speed(float desired_speed) {
-  status_changed = true;
+  App.updates_available(true);
 
   speed = desired_speed;
 }
@@ -121,7 +121,7 @@ animation_t* animation_lookup(const char* name) {
 }
 
 void animation_set(animation_t* animation) {
-  status_changed = true;
+  App.updates_available(true);
 
   leds_on();
 
@@ -144,50 +144,24 @@ bool animation_set(const char* name) {
 #define ANIMATION_SPEED_PERSISTENCE_FILE "/config/animation_speed"
 
 void animation_persist() {
-  File f = SPIFFS.open(ANIMATION_SPEED_PERSISTENCE_FILE, FILE_WRITE);
-  f.println(speed);
-  f.close();
-
-  if(current_animation) {
-    f = SPIFFS.open(ANIMATION_PERSISTENCE_FILE, FILE_WRITE);
-    f.println(current_animation->name);
-    f.close();
-    return;
-  } else
-    SPIFFS.remove(ANIMATION_PERSISTENCE_FILE);
+  App.config.set("animation", "", current_animation->name);
+  App.config.set("animation", "speed", String(speed));
 }
 
 void animation_clear_persist() {
-  SPIFFS.remove(ANIMATION_PERSISTENCE_FILE);
-  SPIFFS.remove(ANIMATION_SPEED_PERSISTENCE_FILE);
+  App.config.clear("animation", "");
+  App.config.clear("animation", "speed");
 }
 
 void animation_restore() {
-  File file = SPIFFS.open(ANIMATION_PERSISTENCE_FILE, FILE_READ);
+  boolean success = false;
+  String results;
 
-  if(file) {
-    char buffer[32];
-    while(file.available()) {
-      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length > 0 ? length - 1 : 0] =  '\0';
-    }
+  results = App.config.get("animation", "", &success);
+  if(success)
+    animation_set(results.c_str());
 
-    animation_set(buffer);
-
-    file.close();
-  }
-
-  file = SPIFFS.open(ANIMATION_SPEED_PERSISTENCE_FILE, FILE_READ);
-
-  if(file) {
-    char buffer[32];
-    while(file.available()) {
-      int length = file.readBytesUntil('\n', buffer, sizeof(buffer));
-      buffer[length > 0 ? length - 1 : 0] =  '\0';
-    }
-
-    animation_speed(atof(buffer));
-
-    file.close();
-  }
+  results = App.config.get("animation", "speed", &success);
+  if(success)
+    animation_speed(atof(results.c_str()));
 }
