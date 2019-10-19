@@ -11,6 +11,8 @@ void leds_off();
 bool leds_status();
 uint8_t leds_brightness(void);            // 0 - 100%
 void leds_brightness(uint8_t brightness); // 0 - 100%
+uint8_t leds_maximum_brightness(void);            // 0 - 100%
+void leds_maximum_brightness(uint8_t brightness); // 0 - 100%
 
 void leds_persist();
 void leds_clear_persist();
