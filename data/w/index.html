@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width'>
+    <link rel='stylesheet' href='/static/bootstrap.min.css' integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>
+    <link rel='stylesheet' href='/static/colorpicker.min.css' integrity='sha384-rgZjFxA67xGusHTOolh49vhPmf5NcM8W9OhdUvP7xZt65SQgCc/PI0iSQ4EY6XUA' crossorigin='anonymous'>
+    <title>LED Control</title>
+  </head>
+  <body>
+    <div class='container' style='background-color: white'>
+      <h1><a href='/'>LED Controls</a></h1>
+      <div class='row'>
+        <div class='card col-sm border-dark border-rounded'>
+          <div class='card-body'>
+	    <h2 class='card-title'>Color Presets</h2>
+	    <form action='/'>
+  	      <select name='preset' class='form-control'>
+		%PRESET_OPTIONS%
+	      </select>
+              <br/>
+            </form>
+            <hr/>
+	    <form action='/' class='form-inline'>
+	      <label for='r'>Red </label><input type='number' id='r' name='r' min='0' max='255' class='form-control'>
+	      <label for='g'>Green </label><input type='number' id='g' name='g' min='0' max='255' class='form-control'>
+	      <label for='b'>Blue </label><input type='number' id='b' name='b' min='0' max='255' class='form-control'>
+	      <br/><input type='submit' class='form-control btn btn-primary'>
+            </form>
+
+          <div style='float: clear;'></div>
+	  <hr/>
+	  <div id='color-picker-container'></div>
+	</div>
+      </div>
+
+      <div class='card col-sm border-dark border-rounded'>
+        <div class='card-body'>
+          <h2 class='card-title'>Animations</h2>
+          <form action='/'>
+            <select id='animation' name='animation' class='form-control'>
+	      %ANIMATION_OPTIONS%
+	    </select>
+	    <br/>* animation ignores color presets
+<br/>
+</form>
+<hr/>
+<form action='/' class='form'>
+<label for='speed'>Speed factor (0.5 = half, 2 = double)</label>
+<input type='number' step='0.1' class='form-control' id='speed' name='speed' size='4' value='%ANIMATION_SPEED%'>
+</form>
+<hr/>
+<a href='/stop' class='btn btn-info'>Stop Animation</a>
+</div>
+</div>
+</div><!- row ->
+<div class='row'>
+<div class='card col-sm border-dark border-rounded'>
+<div class='card-body'>
+<h2 class='card-title'>Brightness</h2>
+<div><form action='/'>
+  <label for='brightness'>Brightness (0-100 percent)%MAXIMUM_BRIGHTNESS%</label>
+  <input type='number' step='0.1' class='form-control' id='brightness' name='brightness' min='0' max='100' value='%LEDS_BRIGHTNESS%'>
+</form></div>
+<a href='/off' class='btn btn-dark'>Turn Off</a><br/>
+</div>
+</div>
+</div><!- row ->
+<div class='row'>
+<div class='card col-sm border-dark border-rounded'>
+<div class='card-body'>
+<h2 class='card-title'>System</h2>
+<a href='/persist' class='btn btn-success'>Start up with current settings</a><br/>
+<a href='/clear_persist' class='btn btn-danger'>Clear start up settings</a><br/>
+<a href='/restart' class='btn btn-dark'>Restart</a><br/>
+<b>Hostname:</b> %HOSTNAME% <b>IP address:</b> %IP_ADDRESS% <b>MAC address:</b> %MAC_ADDRESS%
+<br/><b>Wifi network:</b> %SSID%
+ <b>RSSI</b>: %RSSI%
+ <b>subnet mask:</b> %SUBNET_MASK%
+ <b>default router:</b> %DEFAULT_ROUTER%
+
+<br/><b>Number of LEDs:</b> %NUM_LEDS%
+ <b>LED controller:</b> %LED_CONTROLLER%
+ <b>R-G-B order:</b> %LED_RGB%
+ <b>Data pin:</b> %LED_DATA_PIN%
+ <b>Clock pin:</b> %LED_CLOCK_PIN%
+
+
+<br/><b>%MQTT_INFO%</b>
+
+    <br/><b>Files:</b>
+  %FILE_LIST%
+
+   <br/><b>SPIFFS:</b> %SPIFFS_USED_BYTES% bytes used of %SPIFFS_TOTAL_BYTES% available
+   </div>
+    </div>
+    </div><!- row ->
+
+%ENVIRONMENT%
+
+<div class='row'>
+Want to hack this?&nbsp; <a href='https://github.com/romkey/vendo'>https://github.com/romkey/vendo</a>
+</div>
+</div>
+<script src='/static/jquery-3.2.1.min.js' integrity='sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f' crossorigin='anonymous'></script>
+<script src='/static/jquery-timeago/1.6.7/jquery.timeago.min.js' integrity='sha384-bIExnxLHdrb4/5cUciUyC490hqkTPFw6V1eUbG0gpKQ67B3dsT6KOdXvl5RycCM6' crossorigin='anonymous'></script>
+<script src='/static/popper.js/1.12.9/umd/popper.min.js' integrity='sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q' crossorigin='anonymous'></script>
+<script src='/static/bootstrap.min.js' integrity='sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl' crossorigin='anonymous'></script>
+<script src='/static/iro.min.js'></script>
+<script>
+$(function () {
+    var colorPicker = new iro.ColorPicker('#color-picker-container', { width: 150 });
+    function onColorChange(color, changes) {
+        $('body').css('background-color', color.hexString);
+        var rgb = color.rgb;
+        $.get('/?r=' + rgb.r + '&g=' + rgb.g + '&b=' + rgb.b);
+        $('#r').val(rgb.r); $('#g').val(rgb.g); $('#b').val(rgb.b);
+        console.log(color.hexString);
+    }
+    colorPicker.on('color:change', onColorChange);
+    $('select').change(function() {
+        this.form.submit();
+    });
+});
+</script>
+</body>
+</html>
