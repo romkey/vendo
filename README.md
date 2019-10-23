@@ -1,12 +1,8 @@
-# Discoball RGB LED Controller Hardware and Software
+# Vendo RGB LED Controller Software
 
 _Use at your own risk! Incorrectly wired LEDs could damage your hardware or even be a fire hazard._
 
-This repo has the hardware plans and code for a simple RGB LED controller called the "discoball".
-
-Discoball is one of several similar hardware and software projects based on the ESP32 and ESP8266: furball, furball-mini, butterball.
-
-Discoball works with RGB LEDs that have built-in controllers like the Adafruit Neopixel, WS2812B, and uses the excellent [http://fastled.io/](FastLED) library to do all the heavy lifting.
+Vendo works with RGB LEDs that have built-in controllers like the Adafruit Neopixel, WS2812B, APA102 and others and uses the excellent [http://fastled.io/](FastLED) library to do all the heavy lifting. It provides web and MQTT-based interfaces
 
 ## Hardware
 
@@ -21,6 +17,8 @@ i've designed a simple printed circuit board called a "discoball" which has all 
 The software is written using the Arduino Core for the ESP32. It's structured to build with [PlatformIO](https://platformio.org/), not the Arduino IDE. PlatformIO changes the build process but shouldn't affect the actual code at all. I use PlatformIO because it's fast, much less cumbersome than the Arduino IDE, and has good library management. It's also (recently) fully open source.
 
 If you want to build this project using the Arduino IDE, and rename `src/main.cpp` to `src/vendo.ino` and the `src` directory to `vendo` and manually install the libraries that are listed in`platformio.ini`.
+
+The user interface consists of a single web page which uses Bootstrap and jQuery. The page is stored in the SPIFFs flash filesystem along with local copies of the needed CSS and Javascript files so that a controller using this code won't need to be connected to the Internet in order to properly serve web pages.
 
 ## Control Interface
 

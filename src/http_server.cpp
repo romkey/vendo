@@ -37,6 +37,32 @@ static AsyncWebServer server(80);
 
 static void handle_root(AsyncWebServerRequest *request), handle_on(AsyncWebServerRequest *request), handle_off(AsyncWebServerRequest *request), handle_start(AsyncWebServerRequest *request), handle_stop(AsyncWebServerRequest *request), handle_status(AsyncWebServerRequest *request), handle_persist(AsyncWebServerRequest *request), handle_clear_persist(AsyncWebServerRequest *request);
 
+// set up the web server
+// register the URLs that it handles, and set things up to serve files from flash storage
+// SPIFFs filenames are limited to 31 characters, so we'll try to keep pathnames short
+void http_server_setup() {
+  server.on("/", HTTP_GET, handle_root);
+  server.on("/persist", HTTP_GET, handle_persist);
+  server.on("/clear_persist", HTTP_GET, handle_clear_persist);
+  server.on("/off", HTTP_GET, handle_off);
+  server.on("/stop", HTTP_GET, handle_stop);
+  server.on("/restart", HTTP_GET, [](AsyncWebServerRequest *request) { ESP.restart(); });
+  server.on("/status.json", HTTP_GET, handle_status);
+
+  server.serveStatic("/static", SPIFFS, "/w/s/");
+
+  server.onNotFound([](AsyncWebServerRequest *request) {
+      request->send(404, "text/plain", "File not found");
+    });
+
+  server.begin();
+}
+
+// not really needed anymore but we'll keep it around just in case
+void http_server_handle() {
+}
+
+// called for each string we might replace
 static String template_handler(const String &var) {
   if(var == "HOSTNAME")
     return App.hostname();
@@ -195,27 +221,6 @@ static String template_handler(const String &var) {
   }
 
   return var;
-}
-
-void http_server_setup() {
-  server.on("/", HTTP_GET, handle_root);
-  server.on("/persist", HTTP_GET, handle_persist);
-  server.on("/clear_persist", HTTP_GET, handle_clear_persist);
-  server.on("/off", HTTP_GET, handle_off);
-  server.on("/stop", HTTP_GET, handle_stop);
-  server.on("/restart", HTTP_GET, [](AsyncWebServerRequest *request) { ESP.restart(); });
-  server.on("/status.json", HTTP_GET, handle_status);
-
-  server.serveStatic("/static", SPIFFS, "/w/s/");
-
-  server.onNotFound([](AsyncWebServerRequest *request) {
-      request->send(404, "text/plain", "File not found");
-    });
-
-  server.begin();
-}
-
-void http_server_handle() {
 }
 
 static void handle_root(AsyncWebServerRequest *request) {
