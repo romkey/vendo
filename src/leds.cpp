@@ -78,24 +78,18 @@ uint8_t leds_maximum_brightness(void) {
   return maximum_brightness;
 }
 
-#define LEDS_MAXIMUM_BRIGHTNESS_PERSISTENCE_FILE "/config/leds_maximum_brightness"
-
 void leds_maximum_brightness(uint8_t brightness) {
   if(brightness == 0)
     brightness = 1;
   if(brightness > 100)
     brightness = 100;
 
+  if(maximum_brightness != brightness)
+    App.config.set("leds", "maximum_brightness", String(maximum_brightness));
+
   maximum_brightness = brightness;
   if(stored_brightness > brightness)
     leds_brightness(brightness);
-
-  // always persist maximum brightness
-  File file = SPIFFS.open(LEDS_MAXIMUM_BRIGHTNESS_PERSISTENCE_FILE, FILE_WRITE);
-  if(file) {
-    file.println(brightness);
-    file.close();
-  }
 }
 
 void leds_fill(uint8_t red, uint8_t green, uint8_t blue) {
@@ -111,9 +105,6 @@ void leds_fill(CRGB color) {
 
   FastLED.show();
 }
-
-#define LEDS_PERSISTENCE_FILE "/config/leds"
-#define LEDS_BRIGHTNESS_PERSISTENCE_FILE "/config/leds_brightness"
 
 void leds_clear_persist() {
   App.config.clear("leds", "");

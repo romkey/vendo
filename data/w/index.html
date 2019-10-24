@@ -3,7 +3,6 @@
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width'>
     <link rel='stylesheet' href='/static/bootstrap.min.css' integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous'>
-    <link rel='stylesheet' href='/static/colorpicker.min.css' integrity='sha384-rgZjFxA67xGusHTOolh49vhPmf5NcM8W9OhdUvP7xZt65SQgCc/PI0iSQ4EY6XUA' crossorigin='anonymous'>
     <title>LED Control</title>
   </head>
   <body>
@@ -88,6 +87,8 @@
             <br/><b>Files:</b>
             %FILE_LIST%
             <br/><b>SPIFFS:</b> %SPIFFS_USED_BYTES% bytes used of %SPIFFS_TOTAL_BYTES% available
+	    <br/><b>Uptime:</b> %UPTIME%
+	    <br/><b>Free heap:</b> %FREEHEAP%
           </div>
         </div>
       </div>
@@ -97,11 +98,7 @@
         Want to hack this?&nbsp; <a href='https://github.com/romkey/vendo'>https://github.com/romkey/vendo</a>
       </div>
     </div>
-    <script src='/static/jquery-3.2.1.min.js' integrity='sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f' crossorigin='anonymous'></script>
-    <script src='/static/jquery.timeago.min.js' integrity='sha384-bIExnxLHdrb4/5cUciUyC490hqkTPFw6V1eUbG0gpKQ67B3dsT6KOdXvl5RycCM6' crossorigin='anonymous'></script>
-    <script src='/static/popper.min.js' integrity='sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q' crossorigin='anonymous'></script>
-    <script src='/static/bootstrap.min.js' integrity='sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl' crossorigin='anonymous'></script>
-    <script src='/static/iro.min.js'></script>
+    <script src='/static/combo.js'></script>
     <script>
       $(function () {
           var colorPicker = new iro.ColorPicker('#color-picker-container', { width: 150 });

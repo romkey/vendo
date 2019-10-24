@@ -220,6 +220,12 @@ static String template_handler(const String &var) {
     return result;
   }
 
+  if(var == "FREEHEAP")
+    return String(ESP.getFreeHeap());
+
+  if(var == "UPTIME")
+    return String(App.uptime());
+
   return var;
 }
 
@@ -230,7 +236,7 @@ static void handle_root(AsyncWebServerRequest *request) {
   if(request->hasParam("animation"))
     animation_set(request->arg("animation").c_str());
   if(request->hasParam("sequence"))
-    animation_set(request->arg("animation").c_str());
+    animation_set(request->arg("sequence").c_str());
 
   if(request->hasParam("r") && request->hasParam("g") && request->hasParam("b")) {
     uint8_t red, green, blue;
@@ -266,25 +272,19 @@ static void handle_off(AsyncWebServerRequest *request) {
   current_animation = NULL;
   animation_speed(1);
 
-  AsyncWebServerResponse *response = request->beginResponse(302);
-  response->addHeader("Location", "/");
-  request->send(response);
+  request->redirect("/");
 }
 
 static void handle_start(AsyncWebServerRequest *request) {
   animation_start();
 
-  AsyncWebServerResponse *response = request->beginResponse(302);
-  response->addHeader("Location", "/");
-  request->send(response);
+  request->redirect("/");
 }
 
 static void handle_stop(AsyncWebServerRequest *request) {
   animation_stop();
 
-  AsyncWebServerResponse *response = request->beginResponse(302);
-  response->addHeader("Location", "/");
-  request->send(response);
+  request->redirect("/");
 }
 
 static void handle_persist(AsyncWebServerRequest *request) {
@@ -292,9 +292,7 @@ static void handle_persist(AsyncWebServerRequest *request) {
   preset_persist();
   animation_persist();
 
-  AsyncWebServerResponse *response = request->beginResponse(302);
-  response->addHeader("Location", "/");
-  request->send(response);
+  request->redirect("/");
 }
 
 static void handle_clear_persist(AsyncWebServerRequest *request) {
@@ -302,9 +300,7 @@ static void handle_clear_persist(AsyncWebServerRequest *request) {
   preset_clear_persist();
   animation_clear_persist();
 
-  AsyncWebServerResponse *response = request->beginResponse(302);
-  response->addHeader("Location", "/");
-  request->send(response);
+  request->redirect("/");
 }
 
 static void handle_status(AsyncWebServerRequest *request) {
