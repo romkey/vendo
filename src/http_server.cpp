@@ -84,7 +84,7 @@ static String template_handler(const String &var) {
     return App.mac_address();
 
   if(var == "IP_ADDRESS")
-    return String(WiFi.localIP());
+    return App.ip_address();
 
   if(var == "SSID")
     return WiFi.SSID();
@@ -230,6 +230,11 @@ static String template_handler(const String &var) {
 }
 
 static void handle_root(AsyncWebServerRequest *request) {
+  if(request->hasParam("hostname")) {
+    App.hostname(request->arg("hostname"));
+    App.persist();
+  }
+
   if(request->hasParam("preset"))
     preset_set(request->arg("preset").c_str());
 

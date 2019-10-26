@@ -19,7 +19,6 @@
 MultiballApp App;
 
 void setup() {
-  const char* hostname = "";
   const wifi_credential_t wifi_credentials[] = {
     { WIFI_SSID1, WIFI_PASSWORD1 },
     { WIFI_SSID2, WIFI_PASSWORD2 },
@@ -29,7 +28,7 @@ void setup() {
   delay(500);
 
   App.wifi_credentials(3, wifi_credentials);
-  App.begin();
+  App.begin("discoball");
 
   http_server_setup();
   Serial.println("[http_server]");

@@ -140,9 +140,6 @@ bool animation_set(const char* name) {
   return false;
 }
 
-#define ANIMATION_PERSISTENCE_FILE "/config/animation"
-#define ANIMATION_SPEED_PERSISTENCE_FILE "/config/animation_speed"
-
 void animation_persist() {
   App.config.set("animation", "", current_animation->name);
   App.config.set("animation", "speed", String(speed));

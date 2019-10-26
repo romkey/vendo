@@ -10,7 +10,6 @@
 CRGB leds[NUM_LEDS];
 
 void leds_setup() {
-
 #ifdef LED_CLOCK_PIN
   FastLED.addLeds<LED_TYPE, LED_DATA_PIN, LED_CLOCK_PIN, LED_RGB>(leds, NUM_LEDS);
 #else
@@ -84,8 +83,10 @@ void leds_maximum_brightness(uint8_t brightness) {
   if(brightness > 100)
     brightness = 100;
 
-  if(maximum_brightness != brightness)
+  if(maximum_brightness != brightness) {
     App.config.set("leds", "maximum_brightness", String(maximum_brightness));
+    App.updates_available(true);
+  }
 
   maximum_brightness = brightness;
   if(stored_brightness > brightness)
