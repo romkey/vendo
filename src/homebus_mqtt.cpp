@@ -2,6 +2,7 @@
 
 #ifdef USE_MQTT
 
+#include "multiball/app.h"
 #include "multiball/wifi.h"
 #include "multiball/mqtt.h"
 
@@ -60,13 +61,12 @@ void homebus_mqtt_handle() {
 
 static void homebus_mqtt_publish_status() {
   char buf[MAX_STATUS_LENGTH+1];
-  IPAddress local = WiFi.localIP();
 
   snprintf(buf, MAX_STATUS_LENGTH, "{ \"id\": \"%s\", ", MQTT_UUID);
   snprintf(buf + strlen(buf),
 	   MAX_STATUS_LENGTH - strlen(buf),
-	   " \"system\": {  \"name\": \"%s\", \"build\": \"%s\", \"freeheap\": %d, \"uptime\": %lu, \"ip\": \"%d.%d.%d.%d\", \"rssi\": %d, \"reboots\": %d, \"wifi_failures\": %d }, ",
-	   wifi_hostname(), "", ESP.getFreeHeap(), uptime.uptime()/1000, local[0], local[1], local[2], local[3], WiFi.RSSI(), bootCount, wifi_failures);
+	   " \"system\": {  \"name\": \"%s\", \"build\": \"%s\", \"freeheap\": %d, \"uptime\": %lu, \"ip\": \"%s\", \"rssi\": %d, \"reboots\": %d, \"wifi_failures\": %d }, ",
+	   App.hostname().c_str(), "", ESP.getFreeHeap(), uptime.uptime()/1000, App.ip_address().c_str(), WiFi.RSSI(), bootCount, wifi_failures);
 #ifdef HAS_BME280
   snprintf(buf + strlen(buf),
 	   MAX_STATUS_LENGTH - strlen(buf),

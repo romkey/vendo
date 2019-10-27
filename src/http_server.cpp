@@ -193,7 +193,7 @@ static String template_handler(const String &var) {
 #ifdef USE_MQTT
     String result = "";
     
-    result = "MQTT (" + (mqtt_is_connected() ? "" : "not ") + "connected)broker:</b> " + MQTT_HOST + " <b>port:</b> " + String(MQTT_PORT) + " <b>username:</b> " + MQTT_USER + " <b>UUID:</b> " + MQTT_UUID;
+    result = String("MQTT (") + (mqtt_is_connected() ? "" : "not ") + "connected)broker:</b> " + MQTT_HOST + " <b>port:</b> " + String(MQTT_PORT) + " <b>username:</b> " + MQTT_USER + " <b>UUID:</b> " + MQTT_UUID;
 
     return result;
 #else
