@@ -84,7 +84,7 @@ void leds_maximum_brightness(uint8_t brightness) {
     brightness = 100;
 
   if(maximum_brightness != brightness) {
-    App.config.set("leds", "maximum_brightness", String(maximum_brightness));
+    App.config.set("leds-maximum_brightness", String(maximum_brightness));
     App.updates_available(true);
   }
 
@@ -108,13 +108,13 @@ void leds_fill(CRGB color) {
 }
 
 void leds_clear_persist() {
-  App.config.clear("leds", "");
-  App.config.clear("leds", "brightness");
+  App.config.clear("leds-");
+  App.config.clear("leds-brightness");
 }
 
 // don't even save state if LEDs are on
 void leds_persist() {
-  App.config.set("leds", "brightness", String(stored_brightness));
+  App.config.set("leds-brightness", String(stored_brightness));
 }
 
 
@@ -122,11 +122,11 @@ void leds_restore() {
   boolean success = false;
   String results;
 
-  results = App.config.get("leds", "brightness", &success);
+  results = App.config.get("leds-brightness", &success);
   if(success)
     leds_brightness(results.toInt());
 
-  results = App.config.get("leds", "maximum_brightness", &success);
+  results = App.config.get("leds-maximum_brightness", &success);
   if(success)
     leds_maximum_brightness(results.toInt());
 }

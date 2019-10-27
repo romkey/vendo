@@ -205,27 +205,29 @@ void preset_rgb(uint8_t red, uint8_t green, uint8_t blue) {
 
 
 void preset_persist() {
-  preset_clear_persist();
+  if(current_preset) {
+    App.config.set("preset-state", current_preset->name);
+  }
+  else
+    App.config.set("preset-state", "");
 
-  if(current_preset)
-    App.config.set("presets", "", current_preset->name);
-
-  if(current_preset == &preset_use_rgb)
-    App.config.set("presets", "rgb", "");
+  if(current_preset == &preset_use_rgb) {
+    App.config.set("preset-rgb", "");
+  }
 }
 
 void preset_clear_persist() {
-  App.config.clear("presets", "");
-  App.config.clear("presets", "rgb");
+  App.config.clear("preset-state");
+  App.config.clear("preset-rgb");
 }
 
 void preset_restore() {
   boolean success = false;
   String results;
 
-  results = App.config.get("presets", "", &success);
+  results = App.config.get("preset-state", &success);
   if(success)
     preset_set(results.c_str());
 
-  results = App.config.get("presets", "rgb", &success);
+  results = App.config.get("preset-rgb", &success);
 }

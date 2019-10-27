@@ -141,24 +141,28 @@ bool animation_set(const char* name) {
 }
 
 void animation_persist() {
-  App.config.set("animation", "", current_animation->name);
-  App.config.set("animation", "speed", String(speed));
+  if(current_animation)
+    App.config.set("animation-state", current_animation->name);
+  else
+    App.config.set("animation-state", "");
+
+  App.config.set("animation-speed", String(speed));
 }
 
 void animation_clear_persist() {
-  App.config.clear("animation", "");
-  App.config.clear("animation", "speed");
+  App.config.clear("animation-state");
+  App.config.clear("animation-speed");
 }
 
 void animation_restore() {
   boolean success = false;
   String results;
 
-  results = App.config.get("animation", "", &success);
+  results = App.config.get("animation-state", &success);
   if(success)
     animation_set(results.c_str());
 
-  results = App.config.get("animation", "speed", &success);
+  results = App.config.get("animation-speed", &success);
   if(success)
     animation_speed(results.toFloat());
 }
