@@ -5,12 +5,14 @@
 
 #include "multiball.h"
 #include <multiball/app.h>
+#include <multiball/homebus.h>
 
 #include "leds.h"
 #include "presets.h"
 #include "animations.h"
 #include "http_server.h"
-#include "homebus_mqtt.h"
+
+#include "vendo.h"
 
 #include <multiball/bme280.h>
 
@@ -33,10 +35,11 @@ void setup() {
   http_server_setup();
   Serial.println("[http_server]");
 
-#ifdef USE_MQTT
-  homebus_mqtt_setup();
+  homebus_configure("Discoball", "", "Homebus", "1");
+  homebus_setup();
+
+  vendo_setup();
   Serial.println("[homebus-mqtt]");
-#endif
 
   leds_setup();
   Serial.println("[leds]");
@@ -53,6 +56,9 @@ void setup() {
 
 void loop() {
   App.handle();
+  homebus_handle();
+
+  vendo_handle();
 
   http_server_handle();
 

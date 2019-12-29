@@ -16,6 +16,7 @@
 #include "multiball/app.h"
 #include "multiball/wifi.h"
 #include "multiball/mqtt.h"
+#include "multiball/homebus.h"
 
 // static WiFiClient client;
 static AsyncWebServer server(80);
@@ -190,15 +191,11 @@ static String template_handler(const String &var) {
     return String(SPIFFS.totalBytes());
 
   if(var == "MQTT_INFO") {
-#ifdef USE_MQTT
     String result = "";
     
-    result = String("MQTT (") + (mqtt_is_connected() ? "" : "not ") + "connected)broker:</b> " + MQTT_HOST + " <b>port:</b> " + String(MQTT_PORT) + " <b>username:</b> " + MQTT_USER + " <b>UUID:</b> " + MQTT_UUID;
+    result = String("MQTT (") + (mqtt_is_connected() ? "" : "not ") + "connected)broker:</b> " + homebus_mqtt_host() + " <b>port:</b> " + String(homebus_mqtt_port()) + " <b>username:</b> " + homebus_mqtt_username() + " <b>UUID:</b> " + homebus_mqtt_uuid();
 
     return result;
-#else
-    return String("No MQTT support");
-#endif
   }
 
   if(var == "ENVIRONMENT") {
