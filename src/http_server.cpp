@@ -196,7 +196,7 @@ static String template_handler(const String &var) {
   if(var == "MQTT_INFO") {
     String result = "";
     
-    result = String("MQTT (") + (mqtt_is_connected() ? "" : "not ") + "connected)broker:</b> " + homebus_mqtt_host() + " <b>port:</b> " + String(homebus_mqtt_port()) + " <b>username:</b> " + homebus_mqtt_username() + " <b>UUID:</b> " + homebus_mqtt_uuid();
+    result = String("MQTT (") + (mqtt_is_connected() ? "" : "not ") + "connected)broker:</b> " + homebus_mqtt_host() + " <b>port:</b> " + String(homebus_mqtt_port()) + " <b>username:</b> " + homebus_mqtt_username() + " <b>UUID:</b> " + homebus_uuid();
 
     return result;
   }
