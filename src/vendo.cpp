@@ -132,7 +132,7 @@ void oldvendo_led_status() {
 static void vendo_publish_status() {
   char buf[MAX_STATUS_LENGTH+1];
 
-  snprintf(buf, MAX_STATUS_LENGTH, "{ \"id\": \"%s\", ", homebus_uuid().c_str());
+  snprintf(buf, MAX_STATUS_LENGTH, "{ \"id\": \"%s\", ", homebus_uuid());
   snprintf(buf + strlen(buf),
 	   MAX_STATUS_LENGTH - strlen(buf),
 	   " \"system\": {  \"name\": \"%s\", \"build\": \"%s\", \"freeheap\": %d, \"uptime\": %lu, \"ip\": \"%s\", \"rssi\": %d, \"reboots\": %d, \"wifi_failures\": %d }, ",
