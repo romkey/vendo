@@ -11,6 +11,9 @@
 #include "leds.h"
 #include "vendo.h"
 
+#include <ArduinoJson.h>
+
+
 #ifdef HAS_BME280
 #include "multiball/bme280.h"
 #endif
@@ -45,6 +48,87 @@ void vendo_handle() {
 
 #define MAX_STATUS_LENGTH 512
 
+#define STRINGIZE_NX(A) #A
+#define STRINGIZE(A) STRINGIZE_NX(A)
+
+/*
+{
+  "org.homebus.leds": {
+    "number": 5,
+    "controller": "WS2812B",
+    "status": "on",
+    "preset": "red",
+    "animation": {
+      "name": "throb",
+      "speed": 2.3
+    },
+    "brightness": 100,
+    "rgb": {
+      "red": 252,
+      "green": 100,
+      "blue": 50
+    },
+    "gradient": {
+      "start": {
+        "red": 252,
+        "green": 100,
+        "blue": 50
+      },
+      "end": {
+        "red": 252,
+        "green": 100,
+        "blue": 50
+      }
+    }
+  }
+}
+*/
+
+void vendo_led_status(char *buf, size_t buf_len) {
+  const size_t capacity = JSON_OBJECT_SIZE(1) + 2*JSON_OBJECT_SIZE(2) + 3*JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(8) + 200;
+  StaticJsonDocument<capacity> doc;
+
+  JsonObject org_homebus_leds = doc.createNestedObject("org.homebus.leds");
+  org_homebus_leds["number"] = NUM_LEDS;
+  org_homebus_leds["controller"] = STRINGIZE(LED_TYPE);
+  org_homebus_leds["status"] = leds_status() ? "on" : "off";
+  org_homebus_leds["preset"] = current_preset ? current_preset->name : NULL;
+
+  if(current_animation) {
+    JsonObject org_homebus_leds_animation = org_homebus_leds.createNestedObject("animation");
+    org_homebus_leds_animation["name"] = current_animation->name;
+    org_homebus_leds_animation["speed"] = animation_speed();
+  }
+
+  org_homebus_leds["brightness"] = leds_brightness();
+
+  JsonObject rgb = org_homebus_leds.createNestedObject("rgb");
+  rgb["red"] = 252;
+  rgb["green"] = 100;
+  rgb["blue"] = 50;
+
+  serializeJson(doc, buf, buf_len);
+}
+
+void oldvendo_led_status() {
+  char buf[MAX_STATUS_LENGTH+1];
+
+  snprintf(buf, MAX_STATUS_LENGTH, "{ \"org.homebus.leds\": { \"number\": %u, \"status\": \"%s\"",
+	   NUM_LEDS, leds_status() ? "on" : "off");
+
+  if(leds_status())
+    snprintf(buf + strlen(buf),
+	     MAX_STATUS_LENGTH - strlen(buf),
+	     ", \"preset\": \"%s\", \"animation\": \"%s\", \"speed\": %.2f, \"brightness\": %u } }",
+	     current_preset ? current_preset->name : NULL,
+	     current_animation ? current_animation->name : NULL,
+	     animation_speed(), leds_brightness());
+  else
+    snprintf(buf + strlen(buf),
+	     MAX_STATUS_LENGTH - strlen(buf),
+	     " } }");
+}
+  
 static void vendo_publish_status() {
   char buf[MAX_STATUS_LENGTH+1];
 

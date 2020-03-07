@@ -24,7 +24,7 @@
               <label for='r'>Red </label><input type='number' id='r' name='r' min='0' max='255' class='form-control'>
               <label for='g'>Green </label><input type='number' id='g' name='g' min='0' max='255' class='form-control'>
               <label for='b'>Blue </label><input type='number' id='b' name='b' min='0' max='255' class='form-control'>
-              <br/><input type='submit' class='form-control btn btn-primary'>
+              <br/><input type='submit' name='Set color' class='form-control btn btn-primary'>
             </form>
             <div style='float: clear;'></div>
             <hr/>
@@ -114,15 +114,76 @@
           function onColorChange(color, changes) {
               $('body').css('background-color', color.hexString);
               var rgb = color.rgb;
-              $.get('/?r=' + rgb.r + '&g=' + rgb.g + '&b=' + rgb.b);
+//              $.get('/?r=' + rgb.r + '&g=' + rgb.g + '&b=' + rgb.b);
               $('#r').val(rgb.r); $('#g').val(rgb.g); $('#b').val(rgb.b);
               console.log(color.hexString);
+            $.ajax({
+                url     : $(this).attr('action'),
+                type    : 'POST',
+                dataType: 'json',
+                data    : $(this).serialize(),
+                success : function( data ) {
+                    update_page(data); 
+                },
+                error   : function( xhr, err ) {
+                         alert('Error');     
+                }
+              });
           }
+
+
+          function update_page(data) {
+              data = data["org.homebus.leds"];
+
+    console.log('UPDATE PAGE', data);
+
+              $('#brightness').attr('value', data["brightness"]);
+              if(data["animation"]) {
+                  $('#speed').attr('value', data["animation"]["speed"]);
+                  $('#animation').val(data["animation"]["name"]); 
+              }
+
+              if(data["rgb"]) {
+                  $('#r').val(data["rgb"]["red"]); 
+                  $('#g').val(data["rgb"]["green"]); 
+                  $('#b').val(data["rgb"]["blue"]); 
+              }
+
+              if(data["preset"])
+                  $('#preset').val(data["preset"]);
+          }
+
           colorPicker.on('color:change', onColorChange);
           $('select').change(function() {
-              this.form.submit();
-          });
-      });
+            $.ajax({
+                url     : $(this).attr('action'),
+                type    : 'POST',
+                dataType: 'json',
+                data    : $(this).serialize(),
+                success : function( data ) {
+                    update_page(data); 
+                },
+                error   : function( xhr, err ) {
+                         alert('Error');     
+                }
+              });          });
+
+         $(document).on('submit', 'form', function(event) {
+            event.preventDefault();
+            $.ajax({
+                url     : $(this).attr('action'),
+                type    : 'POST',
+                dataType: 'json',
+                data    : $(this).serialize(),
+                success : function( data ) {
+                    update_page(data); 
+                },
+                error   : function( xhr, err ) {
+                         alert('Error');     
+                }
+              });
+          }); 
+      }); 
     </script>
   </body>
 </html>

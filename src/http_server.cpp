@@ -18,6 +18,8 @@
 #include "multiball/mqtt.h"
 #include "multiball/homebus.h"
 
+#include "vendo.h"
+
 // static WiFiClient client;
 static AsyncWebServer server(80);
 
@@ -43,6 +45,7 @@ static void handle_root(AsyncWebServerRequest *request), handle_on(AsyncWebServe
 // SPIFFs filenames are limited to 31 characters, so we'll try to keep pathnames short
 void http_server_setup() {
   server.on("/", HTTP_GET, handle_root);
+  server.on("/", HTTP_POST, handle_root);
   server.on("/persist", HTTP_GET, handle_persist);
   server.on("/clear_persist", HTTP_GET, handle_clear_persist);
   server.on("/off", HTTP_GET, handle_off);
@@ -227,20 +230,21 @@ static String template_handler(const String &var) {
 }
 
 static void handle_root(AsyncWebServerRequest *request) {
-  if(request->hasParam("hostname")) {
+  if(request->hasArg("hostname")) {
     App.hostname(request->arg("hostname"));
     App.persist();
   }
 
-  if(request->hasParam("preset"))
+  if(request->hasArg("preset")) {
     preset_set(request->arg("preset").c_str());
+  } 
 
-  if(request->hasParam("animation"))
+  if(request->hasArg("animation"))
     animation_set(request->arg("animation").c_str());
-  if(request->hasParam("sequence"))
+  if(request->hasArg("sequence"))
     animation_set(request->arg("sequence").c_str());
 
-  if(request->hasParam("r") && request->hasParam("g") && request->hasParam("b")) {
+  if(request->hasArg("r") && request->hasArg("g") && request->hasArg("b")) {
     uint8_t red, green, blue;
 
     red = strtol(request->arg("r").c_str(), 0, 16);
@@ -250,21 +254,28 @@ static void handle_root(AsyncWebServerRequest *request) {
     preset_rgb(red, green, blue);
   }
 
-  if(request->hasParam("brightness"))
+  if(request->hasArg("brightness"))
     leds_brightness(request->arg("brightness").toInt());
 
-  if(request->hasParam("maximum_brightness"))
+  if(request->hasArg("maximum_brightness"))
     leds_maximum_brightness(request->arg("maximum_brightness").toInt());
 
-  if(request->hasParam("speed")) {
+  if(request->hasArg("speed")) {
     float speed = request->arg("speed").toFloat();
 
     if(speed)
       animation_speed(speed);
   }
 
-  request->send(SPIFFS, "/w/index.html", String(), false, template_handler);
-  return;
+  if(request->method() == HTTP_GET) {
+    request->send(SPIFFS, "/w/index.html", String(), false, template_handler);
+    return;
+  }
+
+ char buf[512];
+ vendo_led_status(buf, 512);
+
+ request->send(200, "application/json", buf);
 }
 
 static void handle_off(AsyncWebServerRequest *request) {
