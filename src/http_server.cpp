@@ -1,7 +1,4 @@
-#include <SPIFFS.h>
-#include <FS.h>
-
-#include <AsyncTCP.h>
+#include <Arduino.h>
 #include <ESPAsyncWebServer.h>
 
 #include "config.h"
@@ -46,6 +43,8 @@ static void handle_root(AsyncWebServerRequest *request), handle_on(AsyncWebServe
 void http_server_setup() {
   server.on("/", HTTP_GET, handle_root);
   server.on("/", HTTP_POST, handle_root);
+  server.on("/index.html", HTTP_GET, handle_root);
+  server.on("/index.html", HTTP_POST, handle_root);
   server.on("/persist", HTTP_GET, handle_persist);
   server.on("/clear_persist", HTTP_GET, handle_clear_persist);
   server.on("/off", HTTP_GET, handle_off);

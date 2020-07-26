@@ -5,9 +5,6 @@
 #include "animations.h"
 #include "presets.h"
 
-#include <SPIFFS.h>
-#include <FS.h>
-
 /*
  * PRESETS
  *

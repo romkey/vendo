@@ -32,14 +32,20 @@ void setup() {
   App.wifi_credentials(3, wifi_credentials);
   App.begin("discoball");
 
+  if(SPIFFS.begin(true))
+    Serial.println("[SPIFFS]");
+ else
+   Serial.println("SPIFFS failed...");
+
   http_server_setup();
   Serial.println("[http_server]");
 
   homebus_configure("Discoball", "", "Homebus", "1");
   homebus_setup();
 
-  vendo_setup();
-  Serial.println("[homebus-mqtt]");
+  App.handle();
+  delay(250);
+  App.handle();
 
   leds_setup();
   Serial.println("[leds]");
@@ -52,11 +58,14 @@ void setup() {
 
   bme280_setup();
   Serial.println("[bme280]");
+
+
+  vendo_setup();
+  Serial.println("[vendo]");
 }
 
 void loop() {
   App.handle();
-  homebus_handle();
 
   vendo_handle();
 

@@ -35,7 +35,7 @@ void vendo_handle() {
     should_publish = true;
     next_update = millis() + BME280_UPDATE_DELAY;
   }
-#endif HAS_BME280
+#endif // HAS_BME280
 
   if(App.updates_available()) {
     should_publish = true;
@@ -84,67 +84,92 @@ void vendo_handle() {
 }
 */
 
-void vendo_led_status(char *buf, size_t buflen) {
+boolean vendo_led_status(char *buf, size_t buflen) {
   snprintf(buf, buflen,
-	   "{ \"id\": \"%s\", \"org.homebus.experimental.led-control\": { \"status\": \"%s\", \"preset\": \"%s\", \"animation\": \"%s\", \"speed\": %.2f, \"brightness\": %u } }",
-	   homebus_uuid().c_str(),
+	   "{ \"status\": \"%s\", \"preset\": \"%s\", \"animation\": \"%s\", \"speed\": %.2f, \"brightness\": %u }",
 	   leds_status() ? "on" : "off", 
 	   current_preset ? current_preset->name : "none",
 	   current_animation ? current_animation->name : "none",
 	   animation_speed(), leds_brightness());
+
+  Serial.println(buf);
+
+  return true;
 }
 
-static void vendo_led_config(char *buf, size_t buflen) {
+static boolean vendo_led_config(char *buf, size_t buflen) {
+  static boolean published = false;
+
+  if(published)
+    return false;
+
   snprintf(buf, buflen,
-	   "{ \"id\": \"%s\", \"org.homebus.experimental.led-config\": { \"led-count\": %u, \"controller\": \"%s\" } }",
-	   homebus_uuid().c_str(),
+	   "{ \"led-count\": %u, \"controller\": \"%s\" }",
 	   NUM_LEDS, STRINGIZE(LED_TYPE));
+
+  return true;
 }
 
 #ifdef HAS_BME280
-static void vendo_led_air(char *buf, size_t buflen) {
-  snprintf(buf, buflen,
-	   "{ \"id\": \"%s\", \"org.homebus.experimental.air-sensor\": {  \"temperature\": %.1f, \"humidity\": %.1f, \"pressure\": %.1f }, ",
-	   homebus_uuid().c_str(),
+static boolean vendo_led_air(char *buf, size_t buflen) {
+  snprintf(buf,
+	   buflen,
+	   "{  \"temperature\": %.1f, \"humidity\": %.1f, \"pressure\": %.1f }",
 	   bme280_current_temperature(), bme280_current_humidity(), bme280_current_pressure());
+
+  Serial.println(buf);
+
+  published = true;
+
+  return true;
 }
 #endif
 
-static void vendo_led_system(char *buf, size_t buflen) {
+static boolean vendo_led_system(char *buf, size_t buflen) {
   static IPAddress oldIP = IPAddress(0, 0, 0, 0);
   static String mac_address = WiFi.macAddress();
   IPAddress local = WiFi.localIP();
 
-  snprintf(buf, buflen,
-	   "{ \"id\": \"%s\", \"org.homebus.experimental.led-system\": { \"name\": \"%s\", \"build\": \"%s\", \"ip\": \"%d.%d.%d.%d\", \"mac_addr\": \"%s\" } }",
-	   homebus_uuid().c_str(),
-	   App.hostname().c_str(), App.build_info().c_str(), local[0], local[1], local[2], local[3], mac_address.c_str());
+  if(oldIP == local)
+    return false;
+
+  snprintf(buf,
+	   buflen,
+	   "{ \"name\": \"%s\", \"platform\": \"%s\", \"build\": \"%s\", \"ip\": \"%d.%d.%d.%d\", \"mac_addr\": \"%s\" }",
+	   App.hostname().c_str(), "discoball", App.build_info().c_str(), local[0], local[1], local[2], local[3], mac_address.c_str());
+
+  Serial.println(buf);
+
+  return true;
 }
 
-static void vendo_led_diagnostic(char *buf, size_t buflen) {
-    snprintf(buf, buflen, "{ \"id\": \"%s\", \"org.homebus.experimental.led-diagnostic\": { \"freeheap\": %d, \"uptime\": %lu, \"rssi\": %d, \"reboots\": %d, \"wifi_failures\": %d } }",
-	   homebus_uuid().c_str(),
-	   ESP.getFreeHeap(), App.uptime()/1000, WiFi.RSSI(), App.boot_count(), App.wifi_failures());
+static boolean vendo_led_diagnostic(char *buf, size_t buflen) {
+    snprintf(buf,
+	     buflen,
+	     "{ \"platform\": \"%s\", \"freeheap\": %d, \"uptime\": %lu, \"rssi\": %d, \"reboots\": %d, \"wifi_failures\": %d }",
+	     "discoball", ESP.getFreeHeap(), App.uptime()/1000, WiFi.RSSI(), App.boot_count(), App.wifi_failures());
+
+    return true;
 }
 
 static void vendo_publish_status() {
   char buf[MAX_STATUS_LENGTH];
 
-  vendo_led_status(buf, MAX_STATUS_LENGTH);
-  homebus_publish_to(buf, "org.homebus.experimental.led-update");
+  if(vendo_led_status(buf, MAX_STATUS_LENGTH)) 
+    homebus_publish_to("org.homebus.experimental.led-update", buf);
 
-  vendo_led_config(buf, MAX_STATUS_LENGTH);
-  homebus_publish_to(buf, "org.homebus.experimental.led-config");
+  if(vendo_led_config(buf, MAX_STATUS_LENGTH))
+    homebus_publish_to("org.homebus.experimental.led-config", buf);
 
-  vendo_led_system(buf, MAX_STATUS_LENGTH);
-  homebus_publish_to(buf, "org.homebus.experimental.led-system");
+  if(vendo_led_system(buf, MAX_STATUS_LENGTH))
+    homebus_publish_to("org.homebus.experimental.system", buf);
  
-  vendo_led_diagnostic(buf, MAX_STATUS_LENGTH);
-  homebus_publish_to(buf, "org.homebus.experimental.led-diagnostic");
+  if(vendo_led_diagnostic(buf, MAX_STATUS_LENGTH))
+    homebus_publish_to("org.homebus.experimental.diagnostic", buf);
 
 #ifdef HAS_BME280
-  vendo_led_air(buf, MAX_STATUS_LENGTH);
-  homebus_publish_to(buf, "org.homebus.experimental.air-sensor");
+  if(vendo_led_air(buf, MAX_STATUS_LENGTH))
+    homebus_publish_to("org.homebus.experimental.air-sensor", buf);
 #endif
 }
 
@@ -251,7 +276,8 @@ static void vendo_start_announcement() {
 
   strncat(buf, "]", buffer_length - strlen(buf));
 
-  homebus_publish_to("animations", buf);
+  Serial.println(buf);
+  homebus_publish_to("org.homebus.experimental.discoball-animations", buf);
 
   snprintf(buf, buffer_length, "[ ");
   for(int i = 0; i < presets_length; i++) {
@@ -267,5 +293,6 @@ static void vendo_start_announcement() {
 
   strncat(buf, "}", buffer_length - strlen(buf));
   
-  homebus_publish_to("presets", buf);
+  Serial.println(buf);
+  homebus_publish_to("org.homebus.experimental.discoball-presets", buf);
 }

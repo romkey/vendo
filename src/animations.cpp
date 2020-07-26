@@ -4,9 +4,6 @@
 #include "leds.h"
 #include "animations.h"
 
-#include <SPIFFS.h>
-#include <FS.h>
-
 /*
  * ANIMATIONS
  *

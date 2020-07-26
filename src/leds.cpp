@@ -4,9 +4,6 @@
 #include "leds.h"
 #include "animations.h"
 
-#include <SPIFFS.h>
-#include <FS.h>
-
 CRGB leds[NUM_LEDS];
 
 void leds_setup() {
