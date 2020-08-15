@@ -38,9 +38,11 @@ static AsyncWebServer server(80);
 static void handle_root(AsyncWebServerRequest *request), handle_on(AsyncWebServerRequest *request), handle_off(AsyncWebServerRequest *request), handle_start(AsyncWebServerRequest *request), handle_stop(AsyncWebServerRequest *request), handle_status(AsyncWebServerRequest *request), handle_persist(AsyncWebServerRequest *request), handle_clear_persist(AsyncWebServerRequest *request);
 
 // set up the web server
-// register the URLs that it handles, and set things up to serve files from flash storage
+// mount file system, register the URLs that it handles, and set things up to serve files from flash storage
 // SPIFFs filenames are limited to 31 characters, so we'll try to keep pathnames short
 void http_server_setup() {
+  SPIFFS.begin();
+  
   server.on("/", HTTP_GET, handle_root);
   server.on("/", HTTP_POST, handle_root);
   server.on("/index.html", HTTP_GET, handle_root);
