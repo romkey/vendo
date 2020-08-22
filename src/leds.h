@@ -20,5 +20,6 @@ void leds_restore();
 
 void leds_fill(uint8_t red, uint8_t green, uint8_t blue);
 void leds_fill(CRGB);
+void leds_gradient(CRGB start, CRGB end);
 
 extern CRGB leds[NUM_LEDS];

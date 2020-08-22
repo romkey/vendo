@@ -103,7 +103,7 @@ float animation_speed(void) {
 }
 
 unsigned animate() {
-  if(running)
+  if(running && current_animation)
     return (unsigned)((*current_animation->animation)(false) / speed);
   else
     return 10;

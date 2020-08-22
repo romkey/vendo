@@ -20,9 +20,11 @@ If you want to build this project using the Arduino IDE, and rename `src/main.cp
 
 The user interface consists of a single web page which uses Bootstrap and jQuery. The page is stored in the SPIFFs flash filesystem along with local copies of the needed CSS and Javascript files so that a controller using this code won't need to be connected to the Internet in order to properly serve web pages.
 
+Before you try to build this software, you'll need to copy `src/config.h.sample` to `src/config.h` and edit it. You'll need to set your Wifi network name and password, as well as the number of LEDs in the strand you're controlling, the type of controller and the RGB configuration. If you're using a four wire contoller (with clock and data) you'll need to define `LED_CLOCK_PIN`, otherwise you must _not_ define it.
+
 ## Control Interface
 
-The controller has two control interfaces, implemented over HTTP and MQTT.
+The controller has two control interfaces, implemented over HTTP and Homebus.
 
 Users can:
 - choose preset light patterns
@@ -31,7 +33,7 @@ Users can:
 
 To control over HTTP, find the IP address of the controller and load http://controller-ip-address in a web browser.
 
-MQTT supports the following commands:
+Homebus supports the following commands:
 - restart
 - off
 - stop

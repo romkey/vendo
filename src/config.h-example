@@ -11,18 +11,6 @@
 #define WIFI_SSID3     ""
 #define WIFI_PASSWORD3 ""
 
-// define USE_MQTT if you want to include the MQTT command interface
-// must define USE_MQTT if you define USE_BME280
-// if you define this and you can't connect to the broker it may interfere with the timing on your LED animations
-#define USE_MQTT 1
-
-// MQTT broker info
-#define MQTT_HOST ""
-#define MQTT_PORT 1883
-#define MQTT_USER ""
-#define MQTT_PASS ""
-#define MQTT_UUID ""
-
 // set this to the number of LEDs in your strand
 #define NUM_LEDS 50
 
@@ -33,17 +21,13 @@
 // don't define this if you're  using a 3 wire LED strand
 #define LED_CLOCK_PIN 32
 
-// set this to the name of your LED controller
+// set this to the name of your LED controller. this will be something like WS2812B or APA102 or 
+/ this is not a C string and should not be in quotes.
 // refer to https://github.com/FastLED/FastLED/wiki/Overview#chipsets
 #define LED_TYPE WS2812B
 
 // set this to the order of the Red, Green and Blue LEDs. You'll need to test to find our which are which.
+// valid values are: RGB, GRB, GBR, BGR, BRG, RGB
 #define LED_RGB RGB
-
-// the command topic for MQTT
-// should be replaced with /homebus/MQTT_UUID/cmd
-#define MQTT_CMD_TOPIC "/leds"
-
-#define WIFI_PROVISION_UUID ""
 
 #define VERBOSE

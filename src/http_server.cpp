@@ -28,6 +28,7 @@ static AsyncWebServer server(80);
 //  /?brightness=XXX
 //  /?maximum_brightness=XXX
 //  /?speed=XXX
+// /?gradient_start=RGB&gradient_end=RGB
 // /persist
 // /on
 // /off
@@ -229,6 +230,8 @@ static String template_handler(const String &var) {
 }
 
 static void handle_root(AsyncWebServerRequest *request) {
+  long gradient_start = -1, gradient_end = -1;
+
   if(request->hasArg("hostname")) {
     App.hostname(request->arg("hostname"));
     App.persist();
@@ -264,6 +267,18 @@ static void handle_root(AsyncWebServerRequest *request) {
 
     if(speed)
       animation_speed(speed);
+  }
+
+  if(request->hasArg("gradient_start")) {
+    gradient_start = strtol(request->arg("gradient_start").c_str(), NULL, 16);
+  }
+
+  if(request->hasArg("gradient_end")) {
+    gradient_end = strtol(request->arg("gradient_end").c_str(), NULL, 16);
+  }
+
+  if(gradient_start != -1 && gradient_end != -1) {
+    leds_gradient(CRGB(gradient_start), CRGB(gradient_end));
   }
 
   if(request->method() == HTTP_GET) {

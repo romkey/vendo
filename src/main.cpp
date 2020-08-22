@@ -32,11 +32,6 @@ void setup() {
   App.wifi_credentials(3, wifi_credentials);
   App.begin("discoball");
 
-  if(SPIFFS.begin(true))
-    Serial.println("[SPIFFS]");
- else
-   Serial.println("SPIFFS failed...");
-
   http_server_setup();
   Serial.println("[http_server]");
 
