@@ -110,10 +110,10 @@
     <script src='/static/combo.js'></script>
     <script>
       $(function () {
-          var colorPicker = new iro.ColorPicker('#color-picker-container', { width: 150 });
+          let colorPicker = new iro.ColorPicker('#color-picker-container', { width: 150 });
           function onColorChange(color, changes) {
               $('body').css('background-color', color.hexString);
-              var rgb = color.rgb;
+              let rgb = color.rgb;
 //              $.get('/?r=' + rgb.r + '&g=' + rgb.g + '&b=' + rgb.b);
               $('#r').val(rgb.r); $('#g').val(rgb.g); $('#b').val(rgb.b);
               console.log(color.hexString);
@@ -131,22 +131,23 @@
               });
           }
 
-
           function update_page(data) {
-              data = data["org.homebus.leds"];
-
     console.log('UPDATE PAGE', data);
 
               $('#brightness').attr('value', data["brightness"]);
               if(data["animation"]) {
-                  $('#speed').attr('value', data["animation"]["speed"]);
-                  $('#animation').val(data["animation"]["name"]); 
+                  $('#speed').attr('value', data["speed"]);
+                  $('#animation').val(data["animation"]); 
               }
 
               if(data["rgb"]) {
                   $('#r').val(data["rgb"]["red"]); 
                   $('#g').val(data["rgb"]["green"]); 
                   $('#b').val(data["rgb"]["blue"]); 
+
+                  let rgb = "rgb(" + [ data["rgb"]["red"], data["rgb"]["green"], data["rgb"]["blue"] ].join(', ') + ")";
+
+                  $('body').css('background-color', rgb);
               }
 
               if(data["preset"])

@@ -86,11 +86,12 @@ void vendo_handle() {
 
 boolean vendo_led_status(char *buf, size_t buflen) {
   snprintf(buf, buflen,
-	   "{ \"status\": \"%s\", \"preset\": \"%s\", \"animation\": \"%s\", \"speed\": %.2f, \"brightness\": %u }",
+	   "{ \"status\": \"%s\", \"preset\": \"%s\", \"animation\": \"%s\", \"speed\": %.2f, \"brightness\": %u, \"rgb\": { \"red\": %d, \"green\": %d, \"blue\": %d } }",
 	   leds_status() ? "on" : "off", 
 	   current_preset ? current_preset->name : "none",
 	   current_animation ? current_animation->name : "none",
-	   animation_speed(), leds_brightness());
+	   animation_speed(), leds_brightness(),
+	   leds[0].red, leds[0].green, leds[0].blue);
 
   Serial.println(buf);
 
