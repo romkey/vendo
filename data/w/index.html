@@ -134,6 +134,13 @@
           function update_page(data) {
     console.log('UPDATE PAGE', data);
 
+              if(data["status"] === "off") {
+                $('#animation option:selected').prop('selected', false); 
+                $('#preset option:selected').prop('selected', false);
+                $('body').css('background-color', '#000000');
+                }
+
+
               $('#brightness').attr('value', data["brightness"]);
               if(data["animation"]) {
                   $('#speed').attr('value', data["speed"]);
