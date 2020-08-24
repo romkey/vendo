@@ -51,7 +51,9 @@ void http_server_setup() {
   server.on("/persist", HTTP_GET, handle_persist);
   server.on("/clear_persist", HTTP_GET, handle_clear_persist);
   server.on("/off", HTTP_GET, handle_off);
+  server.on("/off", HTTP_POST, handle_off);
   server.on("/stop", HTTP_GET, handle_stop);
+  server.on("/stop", HTTP_POST, handle_stop);
   server.on("/restart", HTTP_GET, [](AsyncWebServerRequest *request) { ESP.restart(); });
   server.on("/status.json", HTTP_GET, handle_status);
 
@@ -288,10 +290,8 @@ static void handle_root(AsyncWebServerRequest *request) {
     return;
   }
 
- char buf[512];
- vendo_led_status(buf, 512);
 
- request->send(200, "application/json", buf);
+  handle_status(request);
 }
 
 static void handle_off(AsyncWebServerRequest *request) {
@@ -301,19 +301,23 @@ static void handle_off(AsyncWebServerRequest *request) {
   current_animation = NULL;
   animation_speed(1);
 
-  request->redirect("/");
-}
+  if(request->method() == HTTP_GET) {
+    request->redirect("/");
+    return;
+  }
 
-static void handle_start(AsyncWebServerRequest *request) {
-  animation_start();
-
-  request->redirect("/");
+  handle_status(request);
 }
 
 static void handle_stop(AsyncWebServerRequest *request) {
   animation_stop();
 
-  request->redirect("/");
+  if(request->method() == HTTP_GET) {
+    request->redirect("/");
+    return;
+  }
+
+  handle_status(request);
 }
 
 static void handle_persist(AsyncWebServerRequest *request) {
@@ -333,4 +337,8 @@ static void handle_clear_persist(AsyncWebServerRequest *request) {
 }
 
 static void handle_status(AsyncWebServerRequest *request) {
+ char buf[512];
+ vendo_led_status(buf, 512);
+
+ request->send(200, "application/json", buf);
 }
