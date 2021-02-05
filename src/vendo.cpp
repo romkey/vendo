@@ -1,3 +1,5 @@
+#include <ArduinoJson.h>
+
 #include "config.h"
 
 #include "multiball/app.h"
@@ -11,7 +13,7 @@
 #include "leds.h"
 #include "vendo.h"
 
-#include <ArduinoJson.h>
+#include "cmd_json.h"
 
 
 #ifdef HAS_BME280
@@ -157,112 +159,45 @@ static void vendo_publish_status() {
   char buf[MAX_STATUS_LENGTH];
 
   if(vendo_led_status(buf, MAX_STATUS_LENGTH)) 
-    homebus_publish_to("org.homebus.experimental.led-update", buf);
+    homebus_publish_to(DDC_LED_UPDATE, buf);
 
   if(vendo_led_config(buf, MAX_STATUS_LENGTH))
-    homebus_publish_to("org.homebus.experimental.led-config", buf);
+    homebus_publish_to(DDC_LED_CONFIG, buf);
 
   if(vendo_led_system(buf, MAX_STATUS_LENGTH))
-    homebus_publish_to("org.homebus.experimental.system", buf);
+    homebus_publish_to(DDC_SYSTEM, buf);
  
   if(vendo_led_diagnostic(buf, MAX_STATUS_LENGTH))
-    homebus_publish_to("org.homebus.experimental.diagnostic", buf);
+    homebus_publish_to(DDC_DIAGNOSTIC, buf);
 
 #ifdef HAS_BME280
   if(vendo_led_air(buf, MAX_STATUS_LENGTH))
-    homebus_publish_to("org.homebus.experimental.air-sensor", buf);
+    homebus_publish_to(DDC_AIR_SENSOR, buf);
 #endif
 }
 
 void vendo_callback(const char* topic, char* command_buffer) {
-  unsigned length = strlen(command_buffer);
-  char* command = command_buffer;
-
-  // command is meant to be a valid json string, so get rid of the quotes
-  if(command[0] == '"' && command[length-1] == '"') {
-    command[length-1] = '\0';
-    command += 1;
-  }
-
-  Serial.printf("command %s\n", command);
-
-  if(strcmp(command, "off") == 0) {
-    leds_off();
-    return;
-  }
-
-  if(strcmp(command, "stop") == 0) {
-    animation_stop();
-    return;
-  }
-
-  if(strncmp(command, "speed ", 6) == 0) {
-    Serial.printf("speed %s\n", &command[6]);
-    animation_speed(String(&command[6]).toFloat());
-    return;
-  }
-
-  if(strncmp(command, "bright ", 7) == 0) {
-    leds_brightness(atoi(&command[7]));
-    return;
-  }
-
-  if(strncmp(command, "rgb ", 4) == 0) {
-    char temp[3] = "xx";
-    uint8_t red, green, blue;
-
-    Serial.printf("RGB %s\n", &command[4]);
-    temp[0] = command[4];
-    temp[1] = command[5];
-    red = strtol(temp, 0, 16);
-
-    temp[0] = command[6];
-    temp[1] = command[7];
-    green = strtol(temp, 0, 16);
-
-    temp[0] = command[8];
-    temp[1] = command[9];
-    blue = strtol(temp, 0, 16);
-
-    Serial.printf("rgb red %u, green %u, blue %u\n", red, green, blue);
-    preset_rgb(red, green, blue);
-  }
-
-  if(strncmp(command, "preset ", 7) == 0) {
-    Serial.println("got preset");
-    Serial.println(&command[7]);
-
-    if(preset_set(&command[7]))
-      return;
-
-    homebus_publish_to("$error", command);
-    return;
-  }
-
-  if(strncmp(command, "animation ", 10) == 0) {
-    Serial.println("got animation");
-    Serial.println(&command[10]);
-
-    if(animation_set(&command[10]))
-      return;
-
-    homebus_publish_to("$error", command);
-    return;
-  }
+  cmd_json(command_buffer);
 }
 
-static void vendo_start_announcement() {
+
+static uint16_t vendo_animations_json_length() {
   uint16_t animations_buf_size = sizeof("[ ]") + 1;
   for(int i = 0; i < animations_length; i++)
     animations_buf_size += strlen(animations[i].name) + sizeof(", ");
 
+  return animations_buf_size;
+}
+
+static uint16_t vendo_presets_json_length() {
   uint16_t presets_buf_size = sizeof("[ ]") + 1;
   for(int i = 0; i < presets_length; i++)
     presets_buf_size += strlen(presets[i].name) + sizeof(" \"\", ");
 
-  uint16_t buffer_length = max(animations_buf_size, presets_buf_size);
-  char buf[buffer_length];
+  return presets_buf_size;
+}
 
+static void vendo_get_animations_json(char *buf, uint16_t buffer_length) {
   snprintf(buf, buffer_length, "[ ");
   for(int i = 0; i < animations_length; i++) {
     uint16_t current_buf_len = strlen(buf);
@@ -276,10 +211,9 @@ static void vendo_start_announcement() {
   }
 
   strncat(buf, "]", buffer_length - strlen(buf));
+}
 
-  Serial.println(buf);
-  homebus_publish_to("org.homebus.experimental.discoball-animations", buf);
-
+static void vendo_get_presets_json(char *buf, uint16_t buffer_length) {
   snprintf(buf, buffer_length, "[ ");
   for(int i = 0; i < presets_length; i++) {
     uint16_t current_buf_len = strlen(buf);
@@ -292,8 +226,24 @@ static void vendo_start_announcement() {
     snprintf(buf + current_buf_len, buffer_length - current_buf_len, "\"%s\"", presets[i].name);
   }
 
-  strncat(buf, "}", buffer_length - strlen(buf));
-  
+  strncat(buf, "]", buffer_length - strlen(buf));
+}
+
+static void vendo_start_announcement() {
+  uint16_t animations_length = vendo_animations_json_length();
+  uint16_t presets_length = vendo_presets_json_length();
+
+  uint16_t buffer_length = max(animations_length, presets_length);
+  Serial.printf("presets %d animations %d length %d\n", presets_length, animations_length, buffer_length);
+  delay(500);
+
+  char buf[buffer_length + 1];
+
+  vendo_get_animations_json(buf, buffer_length);
   Serial.println(buf);
-  homebus_publish_to("org.homebus.experimental.discoball-presets", buf);
+  homebus_publish_to(DDC_LED_ANIMATIONS, buf);
+  
+  vendo_get_presets_json(buf, buffer_length);
+  Serial.println(buf);
+  homebus_publish_to(DDC_LED_PRESETS, buf);
 }

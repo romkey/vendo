@@ -1,5 +1,7 @@
 #pragma once
 
+#define FASTLED_ESP32_I2S 1
+
 #include <FastLED.h>
 
 #include "hw.h"

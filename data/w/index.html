@@ -42,7 +42,7 @@
               <br/>
             </form>
             <hr/>
-            <form action='/' class='form'>
+            <form action='/' class='form' data-role='speed'>
               <label for='speed'>Speed factor (0.5 = half, 2 = double)</label>
               <input type='number' step='0.1' class='form-control' id='speed' name='speed' size='4' value='%ANIMATION_SPEED%'>
             </form>
@@ -57,12 +57,12 @@
           <div class='card-body'>
             <h2 class='card-title'>Brightness</h2>
             <div>
-              <form action='/'>
+              <form action='/' class='form' data-role='brightness'>
                 <label for='brightness'>Brightness (0-100 percent)%MAXIMUM_BRIGHTNESS%</label>
                 <input type='number' step='0.1' class='form-control' id='brightness' name='brightness' min='0' max='100' value='%LEDS_BRIGHTNESS%'>
               </form>
             </div>
-	    <form action='/off' method='post'>
+	    <form action='/off' method='post' data-role='status' data-value='off'>
 	      <input type='submit' value='Turn Off' class='btn btn-dark'>
 	    </form>
           </div>
@@ -75,10 +75,13 @@
             <h2 class='card-title'>System</h2>
             <a href='/persist' class='btn btn-success'>Start up with current settings</a><br/>
             <a href='/clear_persist' class='btn btn-danger'>Clear start up settings</a><br/>
-            <a href='/restart' class='btn btn-dark'>Restart</a><br/>
+
+	    <form action='/restart' data-role='status' data-value='restart'>
+	      <input type='submit' value='Restart' class='btn btn-danger'>
+	    </form>
 
             <div>
-              <form action='/'>
+              <form action='/' data-role='hostname'>
                 <label for='hostname'>Hostname (mDNS takes effect after restart)</b></label>
                 <input type='text' class='form-control' id='hostname' name='hostname' value='%HOSTNAME%'>
               </form>
@@ -110,90 +113,6 @@
       </div>
     </div>
     <script src='/static/combo.js'></script>
-    <script>
-      $(function () {
-          let colorPicker = new iro.ColorPicker('#color-picker-container', { width: 150 });
-          function onColorChange(color, changes) {
-              $('body').css('background-color', color.hexString);
-              let rgb = color.rgb;
-//              $.get('/?r=' + rgb.r + '&g=' + rgb.g + '&b=' + rgb.b);
-              $('#r').val(rgb.r); $('#g').val(rgb.g); $('#b').val(rgb.b);
-              console.log(color.hexString);
-            $.ajax({
-                url     : $(this).attr('action'),
-                type    : 'POST',
-                dataType: 'json',
-                data    : $(this).serialize(),
-                success : function( data ) {
-                    update_page(data); 
-                },
-                error   : function( xhr, err ) {
-                         alert('Error');     
-                }
-              });
-          }
-
-          function update_page(data) {
-    console.log('UPDATE PAGE', data);
-
-              if(data["status"] === "off") {
-                $('#animation option:selected').prop('selected', false); 
-                $('#preset option:selected').prop('selected', false);
-                $('body').css('background-color', '#000000');
-                }
-
-
-              $('#brightness').attr('value', data["brightness"]);
-              if(data["animation"]) {
-                  $('#speed').attr('value', data["speed"]);
-                  $('#animation').val(data["animation"]); 
-              }
-
-              if(data["rgb"]) {
-                  $('#r').val(data["rgb"]["red"]); 
-                  $('#g').val(data["rgb"]["green"]); 
-                  $('#b').val(data["rgb"]["blue"]); 
-
-                  let rgb = "rgb(" + [ data["rgb"]["red"], data["rgb"]["green"], data["rgb"]["blue"] ].join(', ') + ")";
-
-                  $('body').css('background-color', rgb);
-              }
-
-              if(data["preset"])
-                  $('#preset').val(data["preset"]);
-          }
-
-          colorPicker.on('color:change', onColorChange);
-          $('select').change(function() {
-            $.ajax({
-                url     : $(this).attr('action'),
-                type    : 'POST',
-                dataType: 'json',
-                data    : $(this).serialize(),
-                success : function( data ) {
-                    update_page(data); 
-                },
-                error   : function( xhr, err ) {
-                         alert('Error');     
-                }
-              });          });
-
-         $(document).on('submit', 'form', function(event) {
-            event.preventDefault();
-            $.ajax({
-                url     : $(this).attr('action'),
-                type    : 'POST',
-                dataType: 'json',
-                data    : $(this).serialize(),
-                success : function( data ) {
-                    update_page(data); 
-                },
-                error   : function( xhr, err ) {
-                         alert('Error');     
-                }
-              });
-          }); 
-      }); 
-    </script>
+    <script src='/static/vendo.js'></script>
   </body>
 </html>

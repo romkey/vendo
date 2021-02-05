@@ -9,6 +9,8 @@
 #include "presets.h"
 #include "animations.h"
 
+#include "cmd_json.h"
+
 #include "multiball/bme280.h"
 #include "multiball/app.h"
 #include "multiball/wifi.h"
@@ -19,6 +21,7 @@
 
 // static WiFiClient client;
 static AsyncWebServer server(80);
+static AsyncWebSocket ws("/ws");
 
 // most web requests are handled from the root page
 // requests look like:
@@ -37,6 +40,44 @@ static AsyncWebServer server(80);
 // /status.json
 
 static void handle_root(AsyncWebServerRequest *request), handle_on(AsyncWebServerRequest *request), handle_off(AsyncWebServerRequest *request), handle_start(AsyncWebServerRequest *request), handle_stop(AsyncWebServerRequest *request), handle_status(AsyncWebServerRequest *request), handle_persist(AsyncWebServerRequest *request), handle_clear_persist(AsyncWebServerRequest *request);
+
+// https://randomnerdtutorials.com/esp32-websocket-server-arduino/
+static void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+  AwsFrameInfo *info = (AwsFrameInfo*)arg;
+
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    data[len] = 0;
+    Serial.printf("websocket got %s\n", data);
+
+    vTaskDelay(1);
+    cmd_json((char *)data);
+    vTaskDelay(1);
+  }
+}
+
+static void ws_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
+  switch(type) {
+  case WS_EVT_CONNECT:
+    Serial.println("websocket connected");
+    break;
+
+  case WS_EVT_DISCONNECT:
+    Serial.println("websocket disconnected");
+    break;
+
+  case WS_EVT_ERROR:
+    Serial.println("websocket error");
+    break;
+
+  case WS_EVT_PONG:
+    Serial.println("websocket pong");
+    break;
+
+  case WS_EVT_DATA:
+    handleWebSocketMessage(arg, data, len);
+    break;
+  }
+}
 
 // set up the web server
 // mount file system, register the URLs that it handles, and set things up to serve files from flash storage
@@ -64,10 +105,14 @@ void http_server_setup() {
     });
 
   server.begin();
+
+  ws.onEvent(ws_event);
+  server.addHandler(&ws);
 }
 
 // not really needed anymore but we'll keep it around just in case
 void http_server_handle() {
+  ws.cleanupClients();
 }
 
 // called for each string we might replace
