@@ -22,7 +22,7 @@
 #define LED_CLOCK_PIN 32
 
 // set this to the name of your LED controller. this will be something like WS2812B or APA102 or 
-/ this is not a C string and should not be in quotes.
+// this is not a C string and should not be in quotes.
 // refer to https://github.com/FastLED/FastLED/wiki/Overview#chipsets
 #define LED_TYPE WS2812B
 
