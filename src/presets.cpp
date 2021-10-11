@@ -85,6 +85,15 @@ static void xmas() {
   FastLED.show();
 }
 
+static void halloween() {
+  static CRGB independence[3] = { CRGB::Orange, CRGB::Green, CRGB::Purple };
+
+  for(int i=0; i<NUM_LEDS; i++)
+    leds[i] = independence[i % 3];
+
+  FastLED.show();
+}
+
 static void rainbow() {
   fill_rainbow(&leds[0], NUM_LEDS, 0);
 
@@ -149,6 +158,7 @@ preset_t presets[] = {
   "random", random,
   "reverse watermelon", reverse_watermelon,
   "xmas", xmas,
+  "halloween", halloween,
   "black", black
 };
 
